@@ -3,9 +3,9 @@
                 global          start
 start:
 
-                sub             rsp, 4 * 128 * 8
+                sub             rsp, 8 * 128 * 8
                 lea             rdi, [rsp + 128 * 8]
-                mov             rcx, 1
+                mov             rcx, 128
                 call            read_long
                 mov             rdi, rsp
                 call            read_long
@@ -27,24 +27,22 @@ start:
 ; result:
 ;    mul is written to rdi
 mul_long_long:
-                push            rdi
                 push            rsi
                 push            rcx
                 push            r10
                 push            rbx
 
-                lea             r10, [rsp + 2 * 128 * 8]        ;acc
+                lea             r10, [rsp + 5 * 128 * 8]        ;acc
                 lea             r9, [rsp + 3 * 128 * 8]         ;
-                mov             r13, rdi                        ;src #1
-
 
 
                 clc
 .loop:
                 mov             rbx, [rsi]
                 mov             r12, rsi                        ;src #2
+                mov             r13, rdi                        ;src #1
 
-                mov             rsi, r13
+                mov             rsi, rdi
                 mov             rdi, r9
                 call            copy
 
@@ -60,18 +58,15 @@ mul_long_long:
                 mov             rdi, r13
                 mov             rsi, r12
                 lea             rsi, [rsi + 8]
-
-
                 dec             rcx
                 jnz             .loop
 
-                lea             rdi, [rsp + 2 * 128 * 8]
+                lea             rdi, [rsp + 5 * 128 * 8]
 
                 pop             rbx
                 pop             r10
                 pop             rcx
                 pop             rsi
-                pop             rdi
                 ret
 ; adds two long number
 ;    rdi -- address of summand #1 (long number)
@@ -87,6 +82,7 @@ add_long_long:
                 push            r10
                 push            r12
                 push            r13
+                push            rax
 
                 clc
 .loop:
@@ -97,6 +93,7 @@ add_long_long:
                 dec             rcx
                 jnz             .loop
 
+                pop             rax
                 pop             r13
                 pop             r12
                 pop             r10
@@ -146,6 +143,7 @@ mul_long_short:
                 push            r10
                 push            r12
                 push            r13
+                push            rsi
 
                 xor             rsi, rsi
 .loop:
@@ -159,6 +157,7 @@ mul_long_short:
                 dec             rcx
                 jnz             .loop
 
+                pop             rsi
                 pop             r13
                 pop             r12
                 pop             r10
