@@ -3,22 +3,24 @@
                 global          start
 start:
 
-                sub             rsp, 7 * 128 * 8
+                sub             rsp, 6 * 128 * 8
                 lea             rdi, [rsp + 128 * 8]
                 mov             rcx, 128
                 call            read_long
                 mov             rdi, rsp
                 call            read_long
 
-                lea             rdi, [rsp + 128 * 8]
                 mov             rsi, rsp
 
-                lea             r10, [rsp + 4 * 128 * 8]        ; ans
                 lea             r9, [rsp + 2 * 128 * 8]         ; tmp
-                mov             r14, r10                        ; ans addr const
+                lea             r10, [rsp + 4 * 128 * 8]        ; ans
+                mov             rdi, r9
+                call            set_zero
+                mov             rdi, r10
+                call            set_zero
+                lea             rdi, [rsp + 128 * 8]
 
                 call            mul_long_long
-
                 call            write_long
 
                 mov             al, 0x0a
@@ -35,11 +37,11 @@ start:
 mul_long_long:
                 push            rsi
                 push            rcx
-                push            r10
                 push            rbx
-                push            r14
 
-                clc
+
+                mov             r14, r10                        ; ans addr const
+
 .loop:
                 mov             rbx, [rsi]
                 mov             r12, rsi                        ;src #2
@@ -66,12 +68,23 @@ mul_long_long:
 
                 mov             rdi, r14
 
-                pop             r14
                 pop             rbx
-                pop             r10
                 pop             rcx
                 pop             rsi
                 ret
+
+copy:
+                push            rdi
+                push            rcx
+                push            rsi
+
+                rep movsq
+
+                pop             rsi
+                pop             rcx
+                pop             rdi
+                ret
+
 ; adds two long number
 ;    rdi -- address of summand #1 (long number)
 ;    rsi -- address of summand #2 (long number)
@@ -213,29 +226,6 @@ set_zero:
                 pop             rcx
                 pop             rdi
                 pop             rax
-                ret
-
-copy:
-                push            rbx
-                push            rdi
-                push            rcx
-                push            rsi
-                push            r9
-                push            r10
-                push            r12
-                push            r13
-
-                rep movsq
-
-
-                pop             r13
-                pop             r12
-                pop             r10
-                pop             r9
-                pop             rsi
-                pop             rcx
-                pop             rdi
-                pop             rbx
                 ret
 
 ; checks if a long number is a zero
