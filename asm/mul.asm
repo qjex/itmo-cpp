@@ -9,13 +9,13 @@ start:
                 call            read_long
                 mov             rdi, rsp
                 call            read_long
+
                 lea             rdi, [rsp + 128 * 8]
                 mov             rsi, rsp
 
-                lea             r10, [rsp + 4 * 128 * 8]        ;ans
-                mov             r13, r10       ;ans const
-
-                lea             r9, [rsp + 2 * 128 * 8]         ;tmp
+                lea             r10, [rsp + 4 * 128 * 8]        ; ans
+                lea             r9, [rsp + 2 * 128 * 8]         ; tmp
+                mov             r14, r10                        ; ans addr const
 
                 call            mul_long_long
 
@@ -35,10 +35,9 @@ start:
 mul_long_long:
                 push            rsi
                 push            rcx
-                push            r12
-                push            r13
+                push            r10
                 push            rbx
-
+                push            r14
 
                 clc
 .loop:
@@ -65,11 +64,11 @@ mul_long_long:
                 dec             rcx
                 jnz             .loop
 
-                mov             rdi, r13
+                mov             rdi, r14
 
+                pop             r14
                 pop             rbx
-                pop             r13
-                pop             r12
+                pop             r10
                 pop             rcx
                 pop             rsi
                 ret
@@ -227,6 +226,7 @@ copy:
                 push            r13
 
                 rep movsq
+
 
                 pop             r13
                 pop             r12
