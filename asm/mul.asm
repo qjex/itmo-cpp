@@ -38,7 +38,9 @@ mul_long_long:
                 push            rsi
                 push            rcx
                 push            rbx
+                push            r11
 
+                mov             r11, rcx
 
                 mov             r14, r10                        ; ans addr const
 
@@ -63,11 +65,12 @@ mul_long_long:
                 mov             rdi, r13
                 mov             rsi, r12
                 lea             rsi, [rsi + 8]
-                dec             rcx
+                dec             r11
                 jnz             .loop
 
                 mov             rdi, r14
 
+                pop             r11
                 pop             rbx
                 pop             rcx
                 pop             rsi
