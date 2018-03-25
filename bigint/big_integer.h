@@ -9,8 +9,9 @@
 struct big_integer
 {
     big_integer();
-    big_integer(big_integer const& other) = default;
+    big_integer(big_integer const& other);
     big_integer(int a);
+    big_integer(unsigned int a);
     explicit big_integer(std::string const& str);
     big_integer(bool sign, std::vector<unsigned int> const &d);
    ~big_integer();
@@ -54,9 +55,8 @@ struct big_integer
     bool is_negative() const;
     unsigned int get_digit(size_t pos) const;
     std::vector<unsigned int> get_data() const;
-private:
-
     void normalize();
+private:
     void swap(big_integer& b);
     bool sign;
     std::vector<unsigned int> data;
@@ -87,5 +87,9 @@ std::ostream& operator<<(std::ostream& s, big_integer const& a);
 
 big_integer abs(big_integer const& a);
 std::vector<unsigned int> get_inverted_data(std::vector<unsigned int> data);
+
+big_integer operator/(big_integer a, int b);
+big_integer operator/(big_integer a, unsigned int b);
+int operator%(big_integer a, int b);
 
 #endif // BIG_INTEGER_H

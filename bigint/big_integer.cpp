@@ -10,14 +10,21 @@ typedef unsigned long long long_digit_type;
 const size_t BASE_LEN = 32;
 const digit_type MX_DIGIT = UINT32_MAX;
 
-
 using std::vector;
 
 digit_type digit_cast(int x) {
-    return static_cast<digit_type>(x);
+    return static_cast<digit_type>(x & MX_DIGIT);
 }
 
-big_integer::big_integer() : sign(false), data(1, 0){
+long_digit_type long_digit_cast(int x) {
+    return static_cast<long_digit_type>(x & MX_DIGIT);
+}
+
+big_integer::big_integer() : sign(false), data(1, 0) {
+}
+
+big_integer::big_integer(big_integer const &other) : sign(other.sign), data(other.data) {
+    normalize();
 }
 
 big_integer::big_integer(int a) : data(0) {
@@ -26,6 +33,10 @@ big_integer::big_integer(int a) : data(0) {
         sign = 1;
     }
     data.push_back(digit_cast(llabs(a)));
+}
+
+big_integer::big_integer(unsigned int a) : sign(0), data(1, a) {
+
 }
 
 big_integer::big_integer(bool sign, std::vector<unsigned int> const &d) {
@@ -162,7 +173,7 @@ big_integer operator*(big_integer a, big_integer const &b) {
     for (size_t i = 0; i < a.length(); i++) {
         digit_type carry = 0;
         for (size_t j = 0; carry || j < b.length(); j++) {
-            long_digit_type cur = data[i + j] + static_cast<long_digit_type>(a.get_digit(i)) * b.get_digit(j) + carry;
+            long_digit_type cur = data[i + j] + long_digit_cast(a.get_digit(i)) * b.get_digit(j) + carry;
             data[i + j] = (cur & MX_DIGIT);
             carry = (cur >> BASE_LEN);
         }
@@ -171,24 +182,123 @@ big_integer operator*(big_integer a, big_integer const &b) {
     return big_integer(a.is_negative() ^ b.is_negative(), data);
 }
 
+digit_type get_trial(const digit_type a, const digit_type b, const digit_type c) {
+    long_digit_type res = a;
+    res = ((res << BASE_LEN) + b) / c;
+    if (res > MX_DIGIT) {
+        res = MX_DIGIT;
+    }
+    return res & MX_DIGIT;
+}
+
+void normalize(vector<digit_type> &a) {
+    while (a.size() > 1 && a.back() == 0) {
+        a.pop_back();
+    }
+}
+
+void difference(vector<digit_type> &a, vector<digit_type> const &b) {
+    long_digit_type carry = 0;
+
+    for (size_t i = 0; i < b.size(); i++) {
+        long_digit_type cur = static_cast<long_digit_type > (b[i]) + carry;
+        carry = cur > a[i];
+        a[i] -= (cur & MX_DIGIT);
+    }
+    normalize(a);
+
+}
+
+bool smaller(vector<digit_type> const &a, vector<digit_type> const &b) {
+    for (size_t i = a.size(); i > 0; i--) {
+        if (a[i - 1] != b[i - 1]) {
+            return a[i - 1] < b[i - 1];
+        }
+    }
+    return 0;
+}
+
+void product(vector<digit_type> &res, vector<digit_type> const &a, const digit_type b) {
+    long_digit_type carry = 0;
+    res.resize(a.size() + 1);
+    for (size_t i = 0; i < a.size(); i++) {
+        long_digit_type cur = a[i] + (long_digit_type) a[i] * b + carry;
+        res[i] = (cur & MX_DIGIT);
+        carry = (cur >> BASE_LEN);
+    }
+    res[a.size()] = carry & MX_DIGIT;
+
+    normalize(res);
+}
+
 big_integer operator/(big_integer a, big_integer const &b) {
-    return 1;
+    if (b.length() == 1 && b.get_digit(0) == 0) {
+        throw std::runtime_error("Divison by zero");
+    }
+
+    bool res_sign = a.is_negative() ^b.is_negative();
+    big_integer abs_a(abs(a));
+    big_integer abs_b(abs(b));
+    if (abs_a < abs_b) {
+        return 0;
+    }
+
+    size_t n = abs_a.length();
+    size_t m = abs_b.length();
+
+    if (m == 1) {
+        return big_integer(res_sign, (a / b.get_digit(0)).get_data());
+    }
+
+    digit_type f = digit_cast(((long_digit_type) MX_DIGIT + 1) / ((long_digit_type) b.get_digit(b.length() - 1) + 1));
+
+    big_integer r = abs_a * f;
+    big_integer d = abs_b * f;
+
+    vector<digit_type> ans(r.length() - d.length() + 1);
+
+    big_integer h;
+    long_digit_type d1 = d.get_digit(d.length() - 1);
+
+    for (int k = r.length() - 1; k > static_cast<int>(r.length() - d.length()); --k) {
+        h <<= BASE_LEN;
+        h += r.get_digit(k);
+    }
+    for (size_t k = r.length() - d.length() + 1; k--;) {
+        h <<= BASE_LEN;
+        h += r.get_digit(k);
+
+        long_digit_type r2 = h.get_digit(h.length() - 1);
+        if (h.length() > d.length()) {
+            r2 *= ((long_digit_type )MX_DIGIT + 1);
+            r2 += h.get_digit(h.length() - 2);
+        }
+        long_digit_type qt = std::min(r2 / d1, (long_digit_type) MX_DIGIT);
+        big_integer dq = d * (digit_type)(qt & MX_DIGIT);
+        while (h < dq) {
+            qt--;
+            dq -= d;
+        }
+        ans[k] = qt & MX_DIGIT;
+        h -= dq;
+    }
+    return big_integer(res_sign, ans);
 }
 
 big_integer operator%(big_integer a, big_integer const &b) {
     return a - (a / b) * b;
 }
 
-big_integer apply_two_complement(big_integer const& a, big_integer const& b,
+big_integer apply_two_complement(big_integer const &a, big_integer const &b,
                                  const std::function<digit_type(digit_type, digit_type)> &operation) {
     vector<digit_type> data_a = a.is_negative() ? get_inverted_data(a.get_data()) : a.get_data();
     vector<digit_type> data_b = b.is_negative() ? get_inverted_data(b.get_data()) : b.get_data();
 
-    for (size_t i = 0; i < data_b.size(); i++) {
+    for (size_t i = 0; i < std::max(data_b.size(), data_a.size()); i++) {
         if (i == data_a.size()) {
             data_a.push_back(a.is_negative() ? MX_DIGIT : 0);
         }
-        data_a[i] = operation(data_a[i], data_b[i]);
+        data_a[i] = (i < b.length() ? operation(data_a[i], data_b[i]) : 0);
     }
     bool res_sign = (data_a.back() >> (BASE_LEN - 1)) > 0;
     if (data_a.size() == 1 && data_a[0] == 0) {
@@ -198,20 +308,22 @@ big_integer apply_two_complement(big_integer const& a, big_integer const& b,
 }
 
 big_integer operator&(big_integer a, big_integer const &b) {
-    return apply_two_complement(a, b, [] (digit_type x, digit_type y) -> digit_type {
+    return apply_two_complement(a, b, [](digit_type x, digit_type y) -> digit_type {
         return x & y;
-    });}
+    });
+}
 
 big_integer operator|(big_integer a, big_integer const &b) {
-    return apply_two_complement(a, b, [] (digit_type x, digit_type y) -> digit_type {
+    return apply_two_complement(a, b, [](digit_type x, digit_type y) -> digit_type {
         return x | y;
     });
 }
 
 big_integer operator^(big_integer a, big_integer const &b) {
-    return apply_two_complement(a, b, [] (digit_type x, digit_type y) -> digit_type {
+    return apply_two_complement(a, b, [](digit_type x, digit_type y) -> digit_type {
         return x ^ y;
-    });}
+    });
+}
 
 big_integer operator<<(big_integer a, int b) {
     if (b == 0) {
@@ -245,7 +357,7 @@ big_integer operator>>(big_integer a, int b) {
 
     for (size_t i = 0; i < size; i++) {
         data[i] = (static_cast<long_digit_type >(a.get_digit(i + cnt_blocks)) >> rem);
-        data[i] |= (static_cast<long_digit_type>(a.get_digit(i + cnt_blocks + 1)) << (BASE_LEN - rem));
+        data[i] |= (long_digit_cast(a.get_digit(i + cnt_blocks + 1)) << (BASE_LEN - rem));
     }
     return a.is_negative() ? ~big_integer(!a.is_negative(), data) : big_integer(a.is_negative(), data);
 }
@@ -291,74 +403,63 @@ bool operator>=(big_integer const &a, big_integer const &b) {
     return !(a < b);
 }
 
-//TODO
-digit_type operator%(big_integer const &first, int second) {
-    big_integer abs_big(abs(first));
-    size_t size = first.length();
+int operator%(big_integer a, int b) {
     digit_type carry = 0;
 
-    for (size_t i = size; i != 0; i--) {
-        long_digit_type cur = abs_big.get_digit(i - 1) + carry * MX_DIGIT;
+    for (size_t i = a.length(); i > 0; i--) {
+        long_digit_type prev = (long_digit_cast(MX_DIGIT) + 1) * carry;
+        long_digit_type cur = prev + a.get_digit(i - 1);
 
-        carry = static_cast<digit_type>(cur % second);
+        carry = static_cast<digit_type>(cur % b);
     }
     return carry;
 }
 
-//TODO
-template<typename E>
-big_integer div_big_small(big_integer const &first, E second) {
-    big_integer absFirst(abs(first));
-    bool isNeg = first.is_negative() ^(second < 0 ? 1 : 0);
-    long_digit_type div = abs(static_cast<long long>(second));
-    size_t size = first.length();
-    vector<digit_type> temp(size);
+big_integer operator/(big_integer a, digit_type divisor) {
+    size_t size = a.length();
+    vector<digit_type> tmp(size);
     long_digit_type carry = 0;
+
     for (size_t ii = size; ii != 0; ii--) {
         size_t i = ii - 1;
-        long_digit_type cur = absFirst.get_digit(i) + carry * (1ll * MX_DIGIT + 1);
-        temp[i] = static_cast<digit_type>(cur / div);
-        carry = cur % div;
+        long_digit_type prev = (long_digit_cast(MX_DIGIT) + 1) * carry;
+        long_digit_type cur = prev + a.get_digit(i);
+        tmp[i] = static_cast<digit_type>(cur / divisor);
+        carry = cur % divisor;
     }
-    big_integer T(isNeg, temp);
-    return T;
+    return big_integer(a.is_negative(), tmp);
 }
 
-big_integer operator/(big_integer const &first, int second) {
-    return div_big_small<int>(first, second);
-}
-
-big_integer operator/(big_integer const &first, digit_type second) {
-    return div_big_small<digit_type>(first, second);
+big_integer operator/(big_integer a, int b) {
+    if (b < 0) {
+        return -a / digit_cast(llabs(b));
+    }
+    return a / digit_cast(b);
 }
 
 std::string to_string(big_integer const &a) {
     std::string result;
-//    big_integer abs_big = abs(a);
-//
-//    while (abs_big.length() > 0) {
-//        digit_type t = abs_big % BASE;
-//        abs_big = abs_big / BASE;
-//
-//        for (int i = 0; i < BASE_LEN; i++) {
-//            result.push_back('0' + t % 10);
-//            t /= 10;
-//        }
-//        abs_big.normalize();
-//    }
-//
-//    while (!result.empty() && result.back() == '0') {
-//        result.pop_back();
-//    }
-//
-//    if (result.empty()) {
-//        result.push_back('0');
-//    }
-//
-//    if (a.is_negative()) {
-//        result.push_back('-');
-//    }
-//    reverse(result.begin(), result.end());
+    big_integer abs_big = a;
+
+    while (abs_big.length() != 1 || (abs_big.length() == 1 && abs_big.get_digit(0) != 0)) {
+        digit_type t = abs_big % 10;
+        abs_big = abs_big / 10;
+        result.push_back('0' + t);
+        abs_big.normalize();
+    }
+
+    while (!result.empty() && result.back() == '0') {
+        result.pop_back();
+    }
+
+    if (result.empty()) {
+        result.push_back('0');
+    }
+
+    if (a.is_negative()) {
+        result.push_back('-');
+    }
+    reverse(result.begin(), result.end());
     return result;
 }
 
@@ -402,9 +503,10 @@ unsigned int big_integer::get_digit(size_t pos) const {
         return 0;
     }
 }
-vector<digit_type > big_integer::get_data() const {
+vector<digit_type> big_integer::get_data() const {
     return data;
 }
+
 std::vector<digit_type> get_inverted_data(std::vector<digit_type> data) {
     for (auto &x : data) {
         x = ~x;
