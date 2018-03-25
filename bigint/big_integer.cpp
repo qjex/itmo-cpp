@@ -34,17 +34,24 @@ big_integer::big_integer(bool sign, std::vector<unsigned int> const &d) {
     normalize();
 }
 
-//TODO
 big_integer::big_integer(std::string const &str) {
     sign = (str[0] == '-');
-    int start_pos = 0;
+    size_t start_pos = 0;
     if (str[0] == '-' || str[0] == '+') {
         start_pos++;
     }
 
-    big
-    normalize();
+    big_integer res;
+    for (size_t i = start_pos; i < str.length(); i++) {
+        res *= 10;
+        res += str[i] - '0';
+    }
 
+    if (sign) {
+        res = -res;
+    }
+
+    swap(res);
 }
 
 big_integer::~big_integer() {
@@ -122,9 +129,9 @@ big_integer operator+(big_integer a, big_integer const &b) {
             if (i == data.size()) {
                 data.push_back(0);
             }
-            long_digit_type res = carry + b.get_digit(i);
-            data[i] += (res << BASE_LEN) >> BASE_LEN;
-            carry = res >> BASE_LEN;
+            long_digit_type cur = static_cast<long_digit_type > (b.get_digit(i)) + carry + data[i];
+            data[i] = cur & MX_DIGIT;
+            carry = cur > MX_DIGIT;
         }
         return big_integer(a.is_negative(), data);
     }
@@ -137,12 +144,10 @@ big_integer operator-(big_integer a, big_integer const &b) {
             vector<digit_type> data = a.get_data();
             bool carry = 0;
             for (size_t i = 0; i < b.length() || carry; i++) {
-                long_digit_type cur = carry + b.get_digit(i);
+                long_digit_type cur = static_cast<long_digit_type > (b.get_digit(i)) + carry;
                 carry = cur > data[i];
-                data[i] -= cur;
-                if (carry) {
-                    data[i] += (1ll << BASE_LEN);
-                }
+                data[i] -= (cur & MX_DIGIT);
+
             }
             return big_integer(a.is_negative(), data);
         }
@@ -167,7 +172,7 @@ big_integer operator*(big_integer a, big_integer const &b) {
 }
 
 big_integer operator/(big_integer a, big_integer const &b) {
-    return a;
+    return 1;
 }
 
 big_integer operator%(big_integer a, big_integer const &b) {
@@ -371,6 +376,7 @@ void big_integer::normalize() {
     }
     if (data.empty()) {
         data.push_back(0);
+        sign = 0;
     }
 }
 
