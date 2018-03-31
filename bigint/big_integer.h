@@ -2,7 +2,6 @@
 #define BIG_INTEGER_H
 
 #include <cstddef>
-#include <gmp.h>
 #include <iosfwd>
 #include <vector>
 
@@ -48,6 +47,8 @@ struct big_integer
     friend bool operator<=(big_integer const& a, big_integer const& b);
     friend bool operator>=(big_integer const& a, big_integer const& b);
 
+    std::pair<big_integer, big_integer> div_mod_operation(big_integer const &b);
+
     friend std::string to_string(big_integer const& a);
     friend big_integer abs(big_integer const& a);
 
@@ -91,5 +92,6 @@ std::vector<unsigned int> get_inverted_data(std::vector<unsigned int> data);
 big_integer operator/(big_integer a, int b);
 big_integer operator/(big_integer a, unsigned int b);
 int operator%(big_integer a, int b);
+unsigned int operator%(big_integer a, unsigned int b);
 
 #endif // BIG_INTEGER_H

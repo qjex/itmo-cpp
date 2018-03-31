@@ -3,6 +3,7 @@
 #include <string>
 #include <stdexcept>
 #include <functional>
+#include <algorithm>
 
 typedef unsigned int digit_type;
 typedef unsigned long long long_digit_type;
@@ -86,14 +87,6 @@ big_integer &big_integer::operator-=(big_integer const &rhs) {
 
 big_integer &big_integer::operator*=(big_integer const &rhs) {
     return *this = *this * rhs;
-}
-
-big_integer &big_integer::operator/=(big_integer const &rhs) {
-    return *this = *this / rhs;
-}
-
-big_integer &big_integer::operator%=(big_integer const &rhs) {
-    return *this = *this % rhs;
 }
 
 big_integer &big_integer::operator&=(big_integer const &rhs) {
@@ -182,72 +175,23 @@ big_integer operator*(big_integer a, big_integer const &b) {
     return big_integer(a.is_negative() ^ b.is_negative(), data);
 }
 
-digit_type get_trial(const digit_type a, const digit_type b, const digit_type c) {
-    long_digit_type res = a;
-    res = ((res << BASE_LEN) + b) / c;
-    if (res > MX_DIGIT) {
-        res = MX_DIGIT;
-    }
-    return res & MX_DIGIT;
-}
-
-void normalize(vector<digit_type> &a) {
-    while (a.size() > 1 && a.back() == 0) {
-        a.pop_back();
-    }
-}
-
-void difference(vector<digit_type> &a, vector<digit_type> const &b) {
-    long_digit_type carry = 0;
-
-    for (size_t i = 0; i < b.size(); i++) {
-        long_digit_type cur = static_cast<long_digit_type > (b[i]) + carry;
-        carry = cur > a[i];
-        a[i] -= (cur & MX_DIGIT);
-    }
-    normalize(a);
-
-}
-
-bool smaller(vector<digit_type> const &a, vector<digit_type> const &b) {
-    for (size_t i = a.size(); i > 0; i--) {
-        if (a[i - 1] != b[i - 1]) {
-            return a[i - 1] < b[i - 1];
-        }
-    }
-    return 0;
-}
-
-void product(vector<digit_type> &res, vector<digit_type> const &a, const digit_type b) {
-    long_digit_type carry = 0;
-    res.resize(a.size() + 1);
-    for (size_t i = 0; i < a.size(); i++) {
-        long_digit_type cur = a[i] + (long_digit_type) a[i] * b + carry;
-        res[i] = (cur & MX_DIGIT);
-        carry = (cur >> BASE_LEN);
-    }
-    res[a.size()] = carry & MX_DIGIT;
-
-    normalize(res);
-}
-
-big_integer operator/(big_integer a, big_integer const &b) {
+std::pair<big_integer, big_integer> big_integer::div_mod_operation(big_integer const &b) {
     if (b.length() == 1 && b.get_digit(0) == 0) {
         throw std::runtime_error("Divison by zero");
     }
 
-    bool res_sign = a.is_negative() ^b.is_negative();
-    big_integer abs_a(abs(a));
+    bool res_sign = (*this).is_negative() ^b.is_negative();
+    big_integer abs_a(abs(*this));
     big_integer abs_b(abs(b));
     if (abs_a < abs_b) {
-        return 0;
+        return {0, *this};
     }
 
     size_t n = abs_a.length();
     size_t m = abs_b.length();
 
     if (m == 1) {
-        return big_integer(res_sign, (a / b.get_digit(0)).get_data());
+        return {big_integer(res_sign, ((*this) / b.get_digit(0)).get_data()), big_integer((*this).is_negative(), {abs_a % b.get_digit(0)})};
     }
 
     digit_type f = digit_cast(((long_digit_type) MX_DIGIT + 1) / ((long_digit_type) b.get_digit(b.length() - 1) + 1));
@@ -282,11 +226,29 @@ big_integer operator/(big_integer a, big_integer const &b) {
         ans[k] = qt & MX_DIGIT;
         h -= dq;
     }
-    return big_integer(res_sign, ans);
+    return {big_integer(res_sign, ans), h};
+}
+
+big_integer &big_integer::operator/=(big_integer const &rhs) {
+    auto tmp = div_mod_operation(rhs).first;
+    swap(tmp);
+    return *this;
+}
+
+big_integer &big_integer::operator%=(big_integer const &rhs) {
+    auto tmp = div_mod_operation(rhs).second;
+    swap(tmp);
+    return *this;
+}
+
+big_integer operator/(big_integer a, big_integer const &b) {
+    a /= b;
+    return a;
 }
 
 big_integer operator%(big_integer a, big_integer const &b) {
-    return a - (a / b) * b;
+    a %= b;
+    return a;
 }
 
 big_integer apply_two_complement(big_integer const &a, big_integer const &b,
@@ -415,6 +377,18 @@ int operator%(big_integer a, int b) {
     return carry;
 }
 
+digit_type operator%(big_integer a, digit_type b) {
+    digit_type carry = 0;
+
+    for (size_t i = a.length(); i > 0; i--) {
+        long_digit_type prev = (long_digit_cast(MX_DIGIT) + 1) * carry;
+        long_digit_type cur = prev + a.get_digit(i - 1);
+
+        carry = static_cast<digit_type>(cur % b);
+    }
+    return carry;
+}
+
 big_integer operator/(big_integer a, digit_type divisor) {
     size_t size = a.length();
     vector<digit_type> tmp(size);
@@ -466,6 +440,7 @@ std::string to_string(big_integer const &a) {
 size_t big_integer::length() const {
     return data.size();
 }
+
 
 std::ostream &operator<<(std::ostream &s, big_integer const &a) {
     return s << to_string(a);
