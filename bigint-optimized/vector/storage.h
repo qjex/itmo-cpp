@@ -41,17 +41,64 @@ private:
     bool _is_big = false;
     digit_type *active_data = nullptr;
 
-    struct big_obj {
-        std::shared_ptr<digit_type> storage_ptr;
+    struct dynamic_storage {
+        int ref_cnt = 0;
         size_t capacity;
+        digit_type arr[];
+    };
+
+    struct big_obj {
+        dynamic_storage *storage_ptr = nullptr;
 
         big_obj() {
-            capacity = 0;
-            storage_ptr = nullptr;
+            storage_ptr = new_dynamic_storage(0);
         }
 
-        big_obj(digit_type *a, size_t capacity) :
-            storage_ptr(a), capacity(capacity) {}
+        dynamic_storage *new_dynamic_storage(size_t capacity) {
+            dynamic_storage* result = (dynamic_storage*) malloc(sizeof(dynamic_storage) + sizeof(digit_type) * capacity);
+            result->ref_cnt = 1;
+            result->capacity = capacity;
+            return result;
+        }
+
+        big_obj(size_t capacity) {
+            storage_ptr = new_dynamic_storage(capacity);
+        }
+
+        big_obj(digit_type *a, size_t size, size_t capacity) {
+            storage_ptr = new_dynamic_storage(capacity);
+            memcpy(storage_ptr->arr, a, size * sizeof(digit_type));
+        }
+
+        void update_capacity(size_t new_capacity) {
+            auto ptr = new_dynamic_storage(new_capacity);
+            memcpy(ptr->arr, storage_ptr->arr, storage_ptr->capacity * sizeof(digit_type));
+            storage_ptr = ptr;
+        }
+
+        big_obj(big_obj const& other) {
+            storage_ptr = other.quick_copy();
+        }
+
+        void detach() {
+            storage_ptr->ref_cnt--;
+            auto ptr = new_dynamic_storage(storage_ptr->capacity);
+            memcpy(ptr->arr, storage_ptr->arr, storage_ptr->capacity * sizeof(digit_type));
+            storage_ptr = ptr;
+        }
+
+        dynamic_storage * quick_copy()const {
+            storage_ptr->ref_cnt++;
+            return storage_ptr;
+        }
+
+        digit_type *get() {
+            return storage_ptr->arr;
+        }
+
+        bool unique() {
+            return storage_ptr->ref_cnt == 1;
+        }
     };
 
     union container {
@@ -62,14 +109,8 @@ private:
         container() {}
     } data;
 
-    struct deleter {
-        void operator()(digit_type const *p) {
-            delete[] p;
-        }
-    };
-
 private:
-    void to_big();
+    void to_big(size_t new_capacity);
     void detach();
     bool is_big() const;
     size_t get_capacity();
@@ -78,6 +119,5 @@ private:
 };
 
 bool operator==(storage const &a, storage const &b);
-digit_type *copy_data(digit_type *data, size_t size, size_t new_size);
 
 #endif //BIGINT_OPTIMIZED_VECTOR_H

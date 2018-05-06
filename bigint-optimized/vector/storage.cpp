@@ -18,7 +18,7 @@ storage::~storage() {
 storage::storage(storage const &a) : _size(a.size()) {
     if (a.is_big()) {
         new(&data.big_data) big_obj(a.data.big_data);
-        active_data = data.big_data.storage_ptr.get();
+        active_data = data.big_data.get();
         _is_big = true;
     } else {
         for (size_t i = 0; i < SMALL_OBJ_SIZE; i++) {
@@ -83,22 +83,29 @@ void storage::ensure_capacity(size_t n) {
         size_t new_capacity = n != 0 ? n * 2 : SMALL_OBJ_SIZE;
         if (_is_big || new_capacity > SMALL_OBJ_SIZE) {
             if (!is_big()) {
-                to_big();
+                to_big(new_capacity);
+            } else {
+                data.big_data.detach();
+                data.big_data.update_capacity(new_capacity);
+                _is_big = true;
+                active_data = data.big_data.get();
             }
-            digit_type *temp = copy_data(active_data, size(), new_capacity);
-//            data.big_data.storage_ptr = std::make_shared<digit_type> (*get_data());
-            data.big_data.storage_ptr.reset(temp, storage::deleter());
-            data.big_data.capacity = new_capacity;
-            _is_big = true;
-            active_data = data.big_data.storage_ptr.get();
+
         }
     }
 }
 
-void storage::to_big() {
-    new(&data.big_data) big_obj(copy_data(active_data, size(), get_capacity()), size());
-    active_data = data.big_data.storage_ptr.get();
+void storage::to_big(size_t new_capacity) {
+    new(&data.big_data) big_obj(active_data, SMALL_OBJ_SIZE, new_capacity);
+    active_data = data.big_data.get();
     _is_big = true;
+}
+
+void storage::detach() {
+    if (is_big() && !data.big_data.unique()) {
+        data.big_data.detach();
+        active_data = data.big_data.get();
+    }
 }
 
 void storage::push_back(digit_type value) {
@@ -116,8 +123,8 @@ void storage::swap(storage &a) noexcept {
     using std::swap;
     if (is_big() && a.is_big()) {
         swap(data.big_data, a.data.big_data);
-        active_data = data.big_data.storage_ptr.get();
-        a.active_data = a.data.big_data.storage_ptr.get();
+        active_data = data.big_data.get();
+        a.active_data = a.data.big_data.get();
     } else if (!is_big() && !a.is_big()) {
         for (size_t i = 0; i < SMALL_OBJ_SIZE; i++) {
             swap(data.small_data[i], a.data.small_data[i]);
@@ -126,12 +133,12 @@ void storage::swap(storage &a) noexcept {
         a.active_data = a.data.small_data;
     } else if (!is_big() && a.is_big()) {
         swap_data(a.data, data);
-        active_data = data.big_data.storage_ptr.get();
+        active_data = data.big_data.get();
         a.active_data = a.data.small_data;
     } else {
         swap_data(data, a.data);
         active_data = data.small_data;
-        a.active_data = a.data.big_data.storage_ptr.get();
+        a.active_data = a.data.big_data.get();
     }
     swap(a._is_big, _is_big);
     swap(a._size, _size);
@@ -150,28 +157,13 @@ void storage::swap_data(container &big_container, container &small_container) {
     }
 }
 
-void storage::detach() {
-    if (is_big() && !data.big_data.storage_ptr.unique()) {
-        data.big_data.storage_ptr.reset(copy_data(active_data, size(), get_capacity()),
-                                         storage::deleter());
-        active_data = data.big_data.storage_ptr.get();
-    }
-}
-
 bool storage::is_big() const {
     return _is_big;
 }
 
 size_t storage::get_capacity() {
     if (is_big()) {
-        return data.big_data.capacity;
+        return data.big_data.storage_ptr->capacity;
     }
     return SMALL_OBJ_SIZE;
-}
-
-digit_type *copy_data(digit_type *data, size_t size, size_t new_size) {
-    auto *res = new digit_type[new_size * sizeof(digit_type)];
-    memcpy(res, data, size * sizeof(digit_type));
-    return res;
-
 }

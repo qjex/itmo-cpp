@@ -17,15 +17,13 @@ add_executable(big_integer_testing
                gtest/gtest.h
                gtest/gtest_main.cc)
 
-add_executable(vector_tests
-               vector_tests.cpp
-        vector/storage.cpp
-        vector/storage.h)
+#add_executable(vector_tests
+#               vector_tests.cpp
+#        vector/storage.cpp
+#        vector/storage.h)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined -fno-omit-frame-pointer -D_GLIBCXX_DEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
-#-fsanitize=address,undefined -O2
-
-target_link_libraries(big_integer_testing -lgmpxx -lpthread)
+target_link_libraries(big_integer_testing -lpthread)
