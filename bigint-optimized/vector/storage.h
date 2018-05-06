@@ -61,19 +61,22 @@ private:
             return result;
         }
 
+        dynamic_storage *new_dynamic_storage(digit_type* a, size_t size, size_t capacity) {
+            auto tmp = new_dynamic_storage(capacity);
+            memcpy(tmp->arr, a, size * sizeof(digit_type));
+            return tmp;
+        }
+
         big_obj(size_t capacity) {
             storage_ptr = new_dynamic_storage(capacity);
         }
 
         big_obj(digit_type *a, size_t size, size_t capacity) {
-            storage_ptr = new_dynamic_storage(capacity);
-            memcpy(storage_ptr->arr, a, size * sizeof(digit_type));
+            storage_ptr = new_dynamic_storage(a, size, capacity);
         }
 
         void update_capacity(size_t new_capacity) {
-            auto ptr = new_dynamic_storage(new_capacity);
-            memcpy(ptr->arr, storage_ptr->arr, storage_ptr->capacity * sizeof(digit_type));
-            storage_ptr = ptr;
+            storage_ptr = new_dynamic_storage(storage_ptr->arr ,storage_ptr->capacity, new_capacity);
         }
 
         big_obj(big_obj const& other) {
@@ -82,9 +85,7 @@ private:
 
         void detach() {
             storage_ptr->ref_cnt--;
-            auto ptr = new_dynamic_storage(storage_ptr->capacity);
-            memcpy(ptr->arr, storage_ptr->arr, storage_ptr->capacity * sizeof(digit_type));
-            storage_ptr = ptr;
+            storage_ptr = new_dynamic_storage(storage_ptr->arr, storage_ptr->capacity, storage_ptr->capacity);
         }
 
         dynamic_storage * quick_copy()const {
