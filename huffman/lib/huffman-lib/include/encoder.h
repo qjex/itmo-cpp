@@ -13,14 +13,13 @@
 #include "tree.h"
 #include "huffman_code.h"
 
-class Encoder {
+class Encoder : public Huffman {
 public:
     Encoder() = delete;
-    Encoder(Frequency const &frequency);
+    explicit Encoder(Frequency const &frequency);
     Code encode_segment(std::vector<char> const &data);
     Code encode_segment(std::string const &data);
-private:
-    Huffman huffman;
+    Code encode_char(char c);
 };
 
 #endif //HUFFMAN_LIB_ENCODER_H

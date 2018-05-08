@@ -13,13 +13,13 @@ typedef std::pair<char, int> occur;
 
 struct Frequency {
     Frequency() = default;
-    Frequency(std::string s);
-    void add_char(char c, int cnt);
+    explicit Frequency(std::string s);
+    void add_char(char c, unsigned long long cnt);
     void add_char(char c);
     std::vector<occur> get_data()const;
     size_t size();
 private:
-    std::unordered_map<char, int> data;
+    std::unordered_map<char, unsigned long long> data;
 };
 
 #endif //HUFFMAN_LIB_FREQUENCY_H

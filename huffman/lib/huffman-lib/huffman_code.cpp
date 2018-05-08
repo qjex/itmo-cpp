@@ -17,7 +17,6 @@ void Code::add_bit(bool b) {
 
 size_t Code::get_pos(size_t ind)const {
     ind %= CHAR_BIT;
-//    return ind;
     return (CHAR_BIT - 1 - ind);
 }
 
@@ -47,4 +46,8 @@ std::string Code::to_string() {
         res += '0' + get(i);
     }
     return res;
+}
+
+std::vector<char> Code::get_data() {
+    return data;
 }

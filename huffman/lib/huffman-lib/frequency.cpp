@@ -4,7 +4,7 @@
 
 #include "include/frequency.h"
 
-void Frequency::add_char(char c, int cnt) {
+void Frequency::add_char(char c, unsigned long long cnt) {
     data[c] += cnt;
 }
 
@@ -23,6 +23,7 @@ std::vector<occur> Frequency::get_data()const {
 size_t Frequency::size() {
     return data.size();
 }
+
 Frequency::Frequency(std::string s) {
     for (char c : s) {
         add_char(c);

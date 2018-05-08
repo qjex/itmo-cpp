@@ -5,10 +5,9 @@
 #include "include/encoder.h"
 #include <utility>
 
-Encoder::Encoder(Frequency const &frequency) : huffman(frequency) {};
+Encoder::Encoder(Frequency const &frequency) : Huffman(frequency) {};
 
 Code Encoder::encode_segment(std::vector<char> const &data) {
-    auto codes = huffman.get_codes();
     Code res;
 
     for (char c : data) {
@@ -16,7 +15,14 @@ Code Encoder::encode_segment(std::vector<char> const &data) {
     }
     return res;
 }
+
 Code Encoder::encode_segment(std::string const &data) {
     std::vector<char> tmp(data.begin(), data.end());
     return encode_segment(tmp);
 }
+
+Code Encoder::encode_char(char c) {
+    return codes[c];
+}
+
+

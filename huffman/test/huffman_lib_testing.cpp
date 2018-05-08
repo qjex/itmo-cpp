@@ -43,16 +43,13 @@ TEST(correctness, simple) {
     EXPECT_EQ(text, rotate(text));
 }
 
-TEST(correctness, patrial_decode) {
-//    string text = "A_DEAD_DAD_CEDED_A_BAD_BABE_A_BEADED_ABACA_BED";
-//    Frequency frequency(text);
-//    Encoder encoder(frequency);
-//    Decoder decoder(frequency);
-//    auto code = encoder.encode_segment(text);
-//
-//    Code part1;
-//    for (size_t i = 0; i < code.size() / 2; i++) {
-//        part1.add_bit(code.get(i));
-//    }
-
+TEST(correctness, huffman_codes_constructor) {
+    string text = "A_DEAD_DAD_CEDED_A_BAD_BABE_A_BEADED_ABACA_BED";
+    Frequency frequency(text);
+    Encoder encoder(frequency);
+    Decoder decoder(encoder.get_codes());
+    string res;
+    for (char c : decoder.decode(encoder.encode_segment(text))) res += c;
+    EXPECT_EQ(text, res);
 }
+

@@ -167,31 +167,39 @@ big_integer operator*(big_integer a, big_integer const &b) {
         digit_type carry = 0;
         for (size_t j = 0; carry || j < b.length(); j++) {
             long_digit_type cur = data[i + j] + long_digit_cast(a.get_digit(i)) * b.get_digit(j) + carry;
-            data[i + j] = (cur & MX_DIGIT);
-            carry = (cur >> BASE_LEN);
+            data[i + j] = static_cast<digit_type >(cur & MX_DIGIT);
+            carry = static_cast<digit_type>(cur >> BASE_LEN);
         }
     }
 
     return big_integer(a.is_negative() ^ b.is_negative(), data);
 }
 
-std::pair<big_integer, big_integer> big_integer::div_mod_operation(big_integer const &b) {
+void big_integer::div_mod_operation(big_integer const &b, bool is_mod) {
     if (b.length() == 1 && b.get_digit(0) == 0) {
-        throw std::runtime_error("Divison by zero");
+        throw std::runtime_error("Division by zero");
     }
 
     bool res_sign = (*this).is_negative() ^b.is_negative();
     big_integer abs_a(abs(*this));
     big_integer abs_b(abs(b));
     if (abs_a < abs_b) {
-        return {0, *this};
+        if (!is_mod) {
+            *this = 0;
+        }
+        return;
     }
 
     size_t n = abs_a.length();
     size_t m = abs_b.length();
 
     if (m == 1) {
-        return {big_integer(res_sign, ((*this) / b.get_digit(0)).get_data()), big_integer((*this).is_negative(), {abs_a % b.get_digit(0)})};
+        if (!is_mod) {
+            *this = big_integer(res_sign, ((*this) / b.get_digit(0)).get_data());
+        } else {
+            *this = big_integer((*this).is_negative(), {abs_a % b.get_digit(0)});
+        }
+        return;
     }
 
     digit_type f = digit_cast(((long_digit_type) MX_DIGIT + 1) / ((long_digit_type) b.get_digit(b.length() - 1) + 1));
@@ -204,7 +212,7 @@ std::pair<big_integer, big_integer> big_integer::div_mod_operation(big_integer c
     big_integer h;
     long_digit_type d1 = d.get_digit(d.length() - 1);
 
-    for (int k = r.length() - 1; k > static_cast<int>(r.length() - d.length()); --k) {
+    for (int k = r.length() - 1; k > static_cast<int>(r.length() - d.length()); k--) {
         h <<= BASE_LEN;
         h += r.get_digit(k);
     }
@@ -214,30 +222,33 @@ std::pair<big_integer, big_integer> big_integer::div_mod_operation(big_integer c
 
         long_digit_type r2 = h.get_digit(h.length() - 1);
         if (h.length() > d.length()) {
-            r2 *= ((long_digit_type )MX_DIGIT + 1);
+            r2 *= ((long_digit_type) MX_DIGIT + 1);
             r2 += h.get_digit(h.length() - 2);
         }
-        long_digit_type qt = std::min(r2 / d1, (long_digit_type) MX_DIGIT);
-        big_integer dq = d * (digit_type)(qt & MX_DIGIT);
+        long_digit_type quotient = std::min(r2 / d1, (long_digit_type) MX_DIGIT);
+        big_integer dq = d * (digit_type) (quotient & MX_DIGIT);
         while (h < dq) {
-            qt--;
+            quotient--;
             dq -= d;
         }
-        ans[k] = qt & MX_DIGIT;
+        ans[k] = quotient & MX_DIGIT;
         h -= dq;
     }
-    return {big_integer(res_sign, ans), h};
+    if (!is_mod) {
+        auto tmp = big_integer(res_sign, ans);
+        swap(tmp);
+    } else {
+        swap(h);
+    }
 }
 
 big_integer &big_integer::operator/=(big_integer const &rhs) {
-    auto tmp = div_mod_operation(rhs).first;
-    swap(tmp);
+    div_mod_operation(rhs, false);
     return *this;
 }
 
 big_integer &big_integer::operator%=(big_integer const &rhs) {
-    auto tmp = div_mod_operation(rhs).second;
-    swap(tmp);
+    div_mod_operation(rhs, true);
     return *this;
 }
 
@@ -441,7 +452,6 @@ size_t big_integer::length() const {
     return data.size();
 }
 
-
 std::ostream &operator<<(std::ostream &s, big_integer const &a) {
     return s << to_string(a);
 }
@@ -471,6 +481,7 @@ big_integer abs(big_integer const &b) {
 bool big_integer::is_negative() const {
     return sign;
 }
+
 unsigned int big_integer::get_digit(size_t pos) const {
     if (pos < data.size()) {
         return data[pos];
@@ -478,6 +489,7 @@ unsigned int big_integer::get_digit(size_t pos) const {
         return 0;
     }
 }
+
 vector<digit_type> big_integer::get_data() const {
     return data;
 }

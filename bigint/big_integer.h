@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <iosfwd>
 #include <vector>
+#include <ostream>
 
 struct big_integer
 {
@@ -47,7 +48,7 @@ struct big_integer
     friend bool operator<=(big_integer const& a, big_integer const& b);
     friend bool operator>=(big_integer const& a, big_integer const& b);
 
-    std::pair<big_integer, big_integer> div_mod_operation(big_integer const &b);
+    void div_mod_operation(big_integer const &b, bool is_mod);
 
     friend std::string to_string(big_integer const& a);
     friend big_integer abs(big_integer const& a);
@@ -57,8 +58,11 @@ struct big_integer
     unsigned int get_digit(size_t pos) const;
     std::vector<unsigned int> get_data() const;
     void normalize();
+
 private:
     void swap(big_integer& b);
+
+private:
     bool sign;
     std::vector<unsigned int> data;
 };

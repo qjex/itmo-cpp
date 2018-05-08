@@ -6,6 +6,7 @@
 #define HUFFMAN_LIB_DECODERR_H
 
 #include <vector>
+#include <unordered_map>
 
 #include "huffman_code.h"
 #include "tree.h"
@@ -14,7 +15,8 @@
 class Decoder {
 public:
     Decoder() = delete;
-    Decoder(Frequency const &frequency);
+    explicit Decoder(Frequency const &frequency);
+    explicit Decoder(std::unordered_map<char, Code> codes);
     std::vector<char> decode(Code const& code);
     void go(bool b);
     bool is_ready();

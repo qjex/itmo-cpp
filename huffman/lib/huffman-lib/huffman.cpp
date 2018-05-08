@@ -3,6 +3,7 @@
 //
 
 #include "include/huffman.h"
+#include <stdexcept>
 
 Huffman::Huffman(Frequency frequency) {
     for (auto x : frequency.get_data()) {
@@ -13,16 +14,24 @@ Huffman::Huffman(Frequency frequency) {
 }
 
 void Huffman::build_tree() {
-    while (q.size() != 1) {
-        auto l = q.top();
-        q.pop();
-        auto r = q.top();
-        q.pop();
-
-        auto top = ptr(new Node(l->freq + r->freq, l, r));
-        q.push(top);
+    if (q.empty()) {
+        return;
     }
-    root = q.top();
+
+    if (q.size() == 1) {
+        root = ptr(new Node(0, q.top(), nullptr));
+    } else {
+        while (q.size() > 1) {
+            auto l = q.top();
+            q.pop();
+            auto r = q.top();
+            q.pop();
+
+            auto top = ptr(new Node(l->freq + r->freq, l, r));
+            q.push(top);
+        }
+        root = q.top();
+    }
     q.pop();
 
     Code code;
@@ -49,4 +58,28 @@ void Huffman::store_codes(ptr const &v, Code &code) {
 
 std::unordered_map<char, Code> Huffman::get_codes() {
     return codes;
+}
+
+Huffman::Huffman(std::unordered_map<char, Code> codes) {
+    root = ptr(new Node(0, 0));
+    for (auto c : codes) {
+        auto cur = root;
+
+        for (size_t i = 0; i < c.second.size(); i++) {
+            bool b = c.second.get(i);
+
+            if (b) {
+                if (cur->right == nullptr) {
+                    cur->right = ptr(new Node(0, 0));
+                }
+                cur = cur->right;
+            } else {
+                if (cur->left == nullptr) {
+                    cur->left = ptr(new Node(0, 0));
+                }
+                cur = cur->left;
+            }
+        }
+        cur->data = c.first;
+    }
 }

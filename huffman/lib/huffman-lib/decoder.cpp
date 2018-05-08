@@ -23,6 +23,8 @@ std::vector<char> Decoder::decode(Code const &code) {
     return res;
 }
 void Decoder::go(bool b) {
+    assert(cur_node != nullptr);
+
     if (cur_node->is_char()) {
         cur_node = huffman.root;
     }
@@ -34,6 +36,7 @@ void Decoder::go(bool b) {
     }
 }
 bool Decoder::is_ready() {
+    assert(cur_node != nullptr);
     return cur_node->is_char();
 }
 char Decoder::get_char() {
@@ -41,4 +44,8 @@ char Decoder::get_char() {
         return cur_node->data;
     }
     throw std::runtime_error("Can' get char from current stream of bits");
+}
+
+Decoder::Decoder(std::unordered_map<char, Code> codes) : huffman(codes), cur_node(huffman.root){
+
 }

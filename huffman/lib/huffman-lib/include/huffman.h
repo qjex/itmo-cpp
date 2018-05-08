@@ -16,16 +16,17 @@ class Huffman {
 public:
     Huffman() = delete;
     explicit Huffman(Frequency frequency);
+    explicit Huffman(std::unordered_map<char, Code> codes);
     std::unordered_map<char, Code> get_codes();
     ptr root;
 private:
     struct comparator {
-        bool operator()(ptr l, ptr r) {
+        bool operator()(ptr const &l, ptr const &r) {
             return l->freq > r->freq;
         }
     };
-
     std::priority_queue<ptr, std::vector<ptr>, comparator> q;
+protected:
     std::unordered_map<char, Code> codes;
 private:
     void build_tree();
