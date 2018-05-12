@@ -12,6 +12,7 @@
 #include <climits>
 
 #include "consts.h"
+#include "impl_consts.h"
 
 class BufferedWriter {
 public:
