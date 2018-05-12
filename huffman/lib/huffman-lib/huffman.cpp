@@ -56,11 +56,11 @@ void Huffman::store_codes(ptr const &v, Code &code) {
     code.pop_bit();
 }
 
-std::unordered_map<char, Code> Huffman::get_codes() {
+std::unordered_map<uint8_t, Code> Huffman::get_codes() {
     return codes;
 }
 
-Huffman::Huffman(std::unordered_map<char, Code> codes) {
+Huffman::Huffman(std::unordered_map<uint8_t, Code> codes) {
     root = ptr(new Node(0, 0));
     for (auto c : codes) {
         auto cur = root;

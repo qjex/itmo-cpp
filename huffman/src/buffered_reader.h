@@ -9,8 +9,9 @@
 #include <fstream>
 #include <stdexcept>
 #include <vector>
+#include <climits>
 
-static const size_t READER_BUFFER_SIZE = 524288;
+#include "consts.h"
 
 class BufferedReader {
 public:
@@ -18,15 +19,15 @@ public:
     explicit BufferedReader(std::string file);
     ~BufferedReader();
     bool can_read();
-    char read_char();
-    short read_short();
-    std::vector<char> read_vector(size_t sz);
+    uint8_t read_char();
+    uint16_t read_short();
+    std::vector<uint8_t> read_vector(size_t sz);
     void reset();
 private:
     std::ifstream stream;
     size_t pos = 0;
     size_t cnt_block = 0;
-    char buffer[READER_BUFFER_SIZE];
+    char buffer[BUFFER_SIZE];
 private:
     void read_buff();
 };

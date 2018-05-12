@@ -9,6 +9,8 @@
 #include "buffered_reader.h"
 #include "buffered_writer.h"
 #include "frequency.h"
+#include <climits>
+
 
 Decoder read_header(BufferedReader &reader);
 

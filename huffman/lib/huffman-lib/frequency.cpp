@@ -4,11 +4,11 @@
 
 #include "include/frequency.h"
 
-void Frequency::add_char(char c, unsigned long long cnt) {
+void Frequency::add_char(uint8_t c, unsigned long long cnt) {
     data[c] += cnt;
 }
 
-void Frequency::add_char(char c) {
+void Frequency::add_char(uint8_t c) {
     add_char(c, 1);
 }
 

@@ -13,10 +13,10 @@ typedef std::shared_ptr<Node> ptr;
 struct Node {
     ptr left;
     ptr right;
-    char data = 0;
+    uint8_t data = 0;
     int freq;
 
-    Node(char c, int freq) {
+    Node(uint8_t c, int freq) {
         this->data = c;
         this->freq = freq;
         left = right = nullptr;

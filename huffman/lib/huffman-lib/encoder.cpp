@@ -7,7 +7,7 @@
 
 Encoder::Encoder(Frequency const &frequency) : Huffman(frequency) {};
 
-Code Encoder::encode_segment(std::vector<char> const &data) {
+Code Encoder::encode_segment(std::vector<uint8_t> const &data) {
     Code res;
 
     for (char c : data) {
@@ -17,11 +17,11 @@ Code Encoder::encode_segment(std::vector<char> const &data) {
 }
 
 Code Encoder::encode_segment(std::string const &data) {
-    std::vector<char> tmp(data.begin(), data.end());
+    std::vector<uint8_t> tmp(data.begin(), data.end());
     return encode_segment(tmp);
 }
 
-Code Encoder::encode_char(char c) {
+Code Encoder::encode_char(uint8_t c) {
     return codes[c];
 }
 

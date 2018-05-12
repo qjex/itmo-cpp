@@ -19,11 +19,11 @@ Frequency calc_frequency(BufferedReader &reader) {
 void write_header(Encoder &encoder, BufferedWriter &writer) {
     auto codes = encoder.get_codes();
 
-    writer.put_short(static_cast<short>(codes.size()));
+    writer.put_short(static_cast<uint16_t>(codes.size()));
     for (auto c : codes) {
         writer.put_char(c.first);
-        writer.put_short(static_cast<short>(c.second.size()));
-        writer.put_short(static_cast<short>(c.second.get_data().size()));
+        writer.put_short(static_cast<uint16_t>(c.second.size()));
+        writer.put_short(static_cast<uint16_t>(c.second.get_data().size()));
         writer.put_vector(c.second.get_data());
     }
 }

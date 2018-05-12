@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libhuffman_lib.a  CMakeFiles/huffman_lib.dir/frequency.cpp.o CMakeFiles/huffman_lib.dir/decoder.cpp.o CMakeFiles/huffman_lib.dir/huffman.cpp.o CMakeFiles/huffman_lib.dir/huffman_code.cpp.o CMakeFiles/huffman_lib.dir/tree.cpp.o CMakeFiles/huffman_lib.dir/encoder.cpp.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libhuffman_lib.a

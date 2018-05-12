@@ -9,8 +9,9 @@
 #include <fstream>
 #include <stdexcept>
 #include <vector>
+#include <climits>
 
-static const size_t WRITER_BUFFER_SIZE = 524288;
+#include "consts.h"
 
 class BufferedWriter {
 public:
@@ -18,17 +19,17 @@ public:
     BufferedWriter(std::string const &file, bool encode);
     ~BufferedWriter();
 
-    void put_char(char c);
-    void put_short(short x);
-    void put_vector(std::vector<char> v);
+    void put_char(uint8_t c);
+    void put_short(uint16_t x);
+    void put_vector(std::vector<uint8_t> v);
     void put_bit(bool b);
 private:
-    char cur_char_size = 0;
-    char cur_char = 0;
+    uint8_t cur_char_size = 0;
+    uint8_t cur_char = 0;
     std::ofstream stream;
     size_t cnt = 0;
     bool encode = false;
-    char buffer[WRITER_BUFFER_SIZE];
+    char buffer[BUFFER_SIZE];
 private:
     void write_buffer();
 };

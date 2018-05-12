@@ -30,8 +30,25 @@
 #include <stdio.h>
 
 #include <gtest/gtest.h>
+#include "big_integer.h"
 
 GTEST_API_ int main(int argc, char **argv) {
+  std::string s(1000000, '1');
+  big_integer b(s);
+  big_integer res(0);
+  int n = 10000;
+
+  double f = clock();
+  for (int i = 0; i < n; ++i) {
+    big_integer c(b);
+//    c += 1;
+    res += c;
+  }
+
+  std::cout << res.length() << std::endl;
+
+  std::cout << std::setprecision(3) << std::fixed << ((clock() - f) / CLOCKS_PER_SEC) * 1000;
+  return 0;
   printf("Running main() from gtest_main.cc\n");
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

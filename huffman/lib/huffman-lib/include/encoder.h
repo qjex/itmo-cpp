@@ -17,9 +17,9 @@ class Encoder : public Huffman {
 public:
     Encoder() = delete;
     explicit Encoder(Frequency const &frequency);
-    Code encode_segment(std::vector<char> const &data);
+    Code encode_segment(std::vector<uint8_t> const &data);
     Code encode_segment(std::string const &data);
-    Code encode_char(char c);
+    Code encode_char(uint8_t c);
 };
 
 #endif //HUFFMAN_LIB_ENCODER_H

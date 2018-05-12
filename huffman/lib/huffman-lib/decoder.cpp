@@ -8,8 +8,8 @@
 Decoder::Decoder(Frequency const &frequency) : huffman(frequency), cur_node(huffman.root) {
 }
 
-std::vector<char> Decoder::decode(Code const &code) {
-    std::vector<char> res;
+std::vector<uint8_t> Decoder::decode(Code const &code) {
+    std::vector<uint8_t> res;
     cur_node = huffman.root;
 
     for (size_t i = 0; i < code.size(); i++) {
@@ -39,13 +39,13 @@ bool Decoder::is_ready() {
     assert(cur_node != nullptr);
     return cur_node->is_char();
 }
-char Decoder::get_char() {
+uint8_t Decoder::get_char() {
     if (cur_node->is_char()) {
         return cur_node->data;
     }
     throw std::runtime_error("Can' get char from current stream of bits");
 }
 
-Decoder::Decoder(std::unordered_map<char, Code> codes) : huffman(codes), cur_node(huffman.root){
+Decoder::Decoder(std::unordered_map<uint8_t, Code> codes) : huffman(codes), cur_node(huffman.root){
 
 }

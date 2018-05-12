@@ -19,7 +19,7 @@ bool BufferedReader::can_read() {
     return !(stream.peek() == EOF && pos == cnt_block);
 }
 
-char BufferedReader::read_char() {
+uint8_t BufferedReader::read_char() {
     if (!can_read()) {
         throw std::runtime_error("Unexpected end of file");
     }
@@ -31,20 +31,20 @@ char BufferedReader::read_char() {
 }
 
 void BufferedReader::read_buff() {
-    stream.read(buffer, READER_BUFFER_SIZE);
+    stream.read(buffer, BUFFER_SIZE);
     cnt_block = static_cast<size_t>(stream.gcount());
     pos = 0;
 }
 
-short BufferedReader::read_short() {
+uint16_t BufferedReader::read_short() {
     short x = read_char();
     x <<= 8;
     x += read_char();
     return x;
 }
 
-std::vector<char> BufferedReader::read_vector(size_t sz) {
-    std::vector<char> res;
+std::vector<uint8_t> BufferedReader::read_vector(size_t sz) {
+    std::vector<uint8_t> res;
     for (size_t i = 0; i < sz; i++) {
         res.push_back(read_char());
     }

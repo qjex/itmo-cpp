@@ -7,7 +7,7 @@
 
 void Code::add_bit(bool b) {
     _size++;
-    if (data.size() * CHAR_BIT < _size) {
+    if (data.size() * BLOCK_LEN < _size) {
         data.push_back(0);
     }
     if (b) {
@@ -16,13 +16,13 @@ void Code::add_bit(bool b) {
 }
 
 size_t Code::get_pos(size_t ind)const {
-    ind %= CHAR_BIT;
-    return (CHAR_BIT - 1 - ind);
+    ind %= BLOCK_LEN;
+    return (BLOCK_LEN - 1 - ind);
 }
 
 void Code::pop_bit() {
     _size--;
-    if ((data.size() - 1) * CHAR_BIT >= _size) {
+    if ((data.size() - 1) * BLOCK_LEN >= _size) {
         data.pop_back();
     } else {
         data.back() &= UINT8_MAX ^ (1 << get_pos(_size));
@@ -30,7 +30,7 @@ void Code::pop_bit() {
 }
 
 bool Code::get(size_t ind)const {
-    return static_cast<bool>(data[ind / CHAR_BIT] & (1 << get_pos(ind)));
+    return static_cast<bool>(data[ind / BLOCK_LEN] & (1 << get_pos(ind)));
 }
 size_t Code::size()const {
     return _size;
@@ -48,6 +48,6 @@ std::string Code::to_string() {
     return res;
 }
 
-std::vector<char> Code::get_data() {
+std::vector<uint8_t> Code::get_data() {
     return data;
 }
