@@ -53,3 +53,12 @@ TEST(correctness, huffman_codes_constructor) {
     EXPECT_EQ(text, res);
 }
 
+TEST(correctness, huffman_one_symbol) {
+    string text = "A";
+    EXPECT_EQ(text, rotate(text));
+}
+
+TEST(correctness, huffman_empty) {
+    string text = "";
+    EXPECT_EQ(text, rotate(text));
+}
