@@ -58,4 +58,3 @@ void BufferedWriter::put_bit(bool b) {
     }
 
 }
-

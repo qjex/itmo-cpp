@@ -34,13 +34,13 @@ void decode(BufferedReader &reader, BufferedWriter &writer) {
 
     do {
         uint8_t nxt = reader.read_char();
-        uint8_t cnt_last = 0;
+        uint8_t cnt_last = BLOCK_LEN;
 
         if (!reader.can_read()) {
             cnt_last = nxt;
         }
 
-        for (uint8_t i = 0; i < BLOCK_LEN - cnt_last; i++) {
+        for (uint8_t i = 0; i < cnt_last; i++) {
             bool b = static_cast<bool>(cur & (1 << (BLOCK_LEN - i - 1)));
 
             decoder.go(b);
@@ -51,4 +51,5 @@ void decode(BufferedReader &reader, BufferedWriter &writer) {
 
         cur = nxt;
     } while (reader.can_read());
+//    writer.close();
 }
