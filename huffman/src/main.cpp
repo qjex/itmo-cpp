@@ -12,7 +12,7 @@
 using namespace std;
 
 void print_usage() {
-    printf("Usage:\nEncode: -e [src] [dst] \nDecode: -d [src] [dst]");
+    printf("Usage:\nEncode: -e [src] [dst] \nDecode: -d [src] [dst]\n");
 }
 
 int main(int argc, char *argv[]) {

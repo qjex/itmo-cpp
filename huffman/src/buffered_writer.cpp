@@ -4,7 +4,7 @@
 
 #include "buffered_writer.h"
 
-BufferedWriter::BufferedWriter(std::string const &file, bool encode) : stream(file), encode(encode) {
+BufferedWriter::BufferedWriter(std::string const &file, bool encode) : stream(file, std::ios::in | std::ofstream::binary), encode(encode) {
 }
 
 BufferedWriter::~BufferedWriter() {

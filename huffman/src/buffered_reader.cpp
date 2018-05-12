@@ -27,7 +27,7 @@ uint8_t BufferedReader::read_char() {
     if (pos == cnt_block) {
         read_buff();
     }
-    return buffer[pos++];
+    return static_cast<uint8_t>(buffer[pos++]);
 }
 
 void BufferedReader::read_buff() {
