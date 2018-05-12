@@ -8,16 +8,14 @@ BufferedWriter::BufferedWriter(std::string const &file, bool encode) : stream(fi
 }
 
 BufferedWriter::~BufferedWriter() {
-    uint8_t sz = 0;
     if (cur_char_size != 0) {
-        sz = cur_char_size;
-        uint8_t pv = sz;
+        uint8_t pv = cur_char_size;
         while (pv < BLOCK_LEN) {
             put_bit(false);
             pv++;
         }
     }
-    if (encode) put_char(sz);
+    if (encode) put_char(prev_char_size);
 
     write_buffer();
     stream.close();
@@ -53,6 +51,7 @@ void BufferedWriter::put_bit(bool b) {
     cur_char += b;
     if (cur_char_size == BLOCK_LEN) {
         put_char(cur_char);
+        prev_char_size = cur_char_size;
         cur_char_size = 0;
         cur_char = 0;
     }

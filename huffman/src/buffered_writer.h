@@ -26,6 +26,7 @@ public:
     void put_bit(bool b);
 private:
     uint8_t cur_char_size = 0;
+    uint8_t prev_char_size = 0;
     uint8_t cur_char = 0;
     std::ofstream stream;
     size_t cnt = 0;
