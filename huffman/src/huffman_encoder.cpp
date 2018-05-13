@@ -33,9 +33,9 @@ void encode(Encoder &encoder, BufferedReader &reader, BufferedWriter &writer) {
 
     while (reader.can_read()) {
         auto code = encoder.encode_char(reader.read_char());
-
         for (size_t i = 0; i < code.size(); i++) {
             writer.put_bit(code.get(i));
         }
     }
+    writer.complete_byte();
 }

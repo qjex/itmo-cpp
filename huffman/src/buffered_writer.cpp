@@ -8,15 +8,6 @@ BufferedWriter::BufferedWriter(std::string const &file, bool encode) : stream(fi
 }
 
 BufferedWriter::~BufferedWriter() {
-    if (cur_char_size != 0) {
-        uint8_t pv = cur_char_size;
-        while (pv < BLOCK_LEN) {
-            put_bit(false);
-            pv++;
-        }
-    }
-    if (encode) put_char(prev_char_size);
-
     write_buffer();
     stream.close();
 }
@@ -46,14 +37,28 @@ void BufferedWriter::put_vector(std::vector<uint8_t> v) {
 }
 
 void BufferedWriter::put_bit(bool b) {
+    last_byte_full = false;
     cur_char_size++;
     cur_char <<= 1;
     cur_char += b;
     if (cur_char_size == BLOCK_LEN) {
         put_char(cur_char);
-        prev_char_size = cur_char_size;
         cur_char_size = 0;
         cur_char = 0;
+        last_byte_full = true;
     }
 
+}
+void BufferedWriter::complete_byte() {
+    if (cur_char_size != 0) {
+        last_byte_size = cur_char_size;
+        uint8_t pv = cur_char_size;
+        while (pv < BLOCK_LEN) {
+            put_bit(false);
+            pv++;
+        }
+    } else {
+        last_byte_size = last_byte_full ? BLOCK_LEN : 0;
+    }
+    put_char(last_byte_size);
 }

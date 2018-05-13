@@ -39,7 +39,7 @@ string rotate(string text) {
 }
 
 TEST(correctness, simple) {
-    string text = "A_DEAD_DAD_CEDED_A_BAD_BABE_A_BEADED_ABACA_BED";
+    string text = "arget_link_libraries(huffman_lib_testing huffman_lib)\n";
     EXPECT_EQ(text, rotate(text));
 }
 

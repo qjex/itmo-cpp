@@ -24,10 +24,12 @@ public:
     void put_short(uint16_t x);
     void put_vector(std::vector<uint8_t> v);
     void put_bit(bool b);
+    void complete_byte();
 private:
     uint8_t cur_char_size = 0;
-    uint8_t prev_char_size = 0;
     uint8_t cur_char = 0;
+    uint8_t last_byte_size = 0;
+    bool last_byte_full = false;
     std::ofstream stream;
     size_t cnt = 0;
     bool encode = false;
