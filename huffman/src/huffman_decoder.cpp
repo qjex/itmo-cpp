@@ -28,6 +28,10 @@ void decode(BufferedReader &reader, BufferedWriter &writer) {
     Decoder decoder = read_header(reader);
     uint8_t cur = reader.read_char();
 
+    if (decoder.get_codes().empty()) {
+        return;
+    }
+
     if (!reader.can_read()) {
         throw std::runtime_error("Decoding file is corrupted");
     }

@@ -61,6 +61,7 @@ std::unordered_map<uint8_t, Code> Huffman::get_codes() {
 }
 
 Huffman::Huffman(std::unordered_map<uint8_t, Code> const &codes) {
+    this->codes = codes;
     root = ptr(new Node(0, 0));
     for (auto c : codes) {
         auto cur = root;
