@@ -43,7 +43,7 @@ void Code::add(Code &code) {
 std::string Code::to_string() {
     std::string res;
     for (size_t i = 0; i < _size; i++) {
-        res += '0' + get(i);
+        res +=  '0' + get(i);
     }
     return res;
 }

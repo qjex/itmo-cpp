@@ -12,17 +12,17 @@
 #include "tree.h"
 #include "huffman.h"
 
-class Decoder {
+class Decoder : public Huffman {
 public:
     Decoder() = delete;
     explicit Decoder(Frequency const &frequency);
-    explicit Decoder(std::unordered_map<uint8_t, Code> codes);
+    explicit Decoder(std::unordered_map<uint8_t, Code> const &codes);
     std::vector<uint8_t> decode(Code const& code);
     void go(bool b);
     bool is_ready();
     uint8_t get_char();
+    ptr get_cur_node();
 private:
-    Huffman huffman;
     ptr cur_node;
 };
 

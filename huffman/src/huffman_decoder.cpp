@@ -44,6 +44,9 @@ void decode(BufferedReader &reader, BufferedWriter &writer) {
             bool b = static_cast<bool>(cur & (1 << (BLOCK_LEN - i - 1)));
 
             decoder.go(b);
+            if (decoder.get_cur_node() == nullptr) {
+                throw std::runtime_error("Decoding file is corrupted");
+            }
             if (decoder.is_ready()) {
                 writer.put_char(decoder.get_char());
             }
@@ -51,5 +54,4 @@ void decode(BufferedReader &reader, BufferedWriter &writer) {
 
         cur = nxt;
     } while (reader.can_read());
-//    writer.close();
 }

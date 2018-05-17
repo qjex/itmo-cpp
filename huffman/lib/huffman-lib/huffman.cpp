@@ -5,7 +5,7 @@
 #include "include/huffman.h"
 #include <stdexcept>
 
-Huffman::Huffman(Frequency frequency) {
+Huffman::Huffman(Frequency const &frequency) {
     for (auto x : frequency.get_data()) {
         auto t = ptr(new Node(x.first, x.second));
         q.push(t);
@@ -60,7 +60,7 @@ std::unordered_map<uint8_t, Code> Huffman::get_codes() {
     return codes;
 }
 
-Huffman::Huffman(std::unordered_map<uint8_t, Code> codes) {
+Huffman::Huffman(std::unordered_map<uint8_t, Code> const &codes) {
     root = ptr(new Node(0, 0));
     for (auto c : codes) {
         auto cur = root;

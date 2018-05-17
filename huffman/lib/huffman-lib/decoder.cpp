@@ -5,12 +5,12 @@
 #include "include/decoder.h"
 #include <stdexcept>
 
-Decoder::Decoder(Frequency const &frequency) : huffman(frequency), cur_node(huffman.root) {
+Decoder::Decoder(Frequency const &frequency) : Huffman(frequency), cur_node(root) {
 }
 
 std::vector<uint8_t> Decoder::decode(Code const &code) {
     std::vector<uint8_t> res;
-    cur_node = huffman.root;
+    cur_node = root;
 
     for (size_t i = 0; i < code.size(); i++) {
         bool b = code.get(i);
@@ -26,7 +26,7 @@ void Decoder::go(bool b) {
     assert(cur_node != nullptr);
 
     if (cur_node->is_char()) {
-        cur_node = huffman.root;
+        cur_node = root;
     }
 
     if (b) {
@@ -46,6 +46,9 @@ uint8_t Decoder::get_char() {
     throw std::runtime_error("Can' get char from current stream of bits");
 }
 
-Decoder::Decoder(std::unordered_map<uint8_t, Code> codes) : huffman(codes), cur_node(huffman.root){
+Decoder::Decoder(std::unordered_map<uint8_t, Code> const &codes) : Huffman(codes), cur_node(root) {
 
+}
+ptr Decoder::get_cur_node() {
+    return cur_node;
 }

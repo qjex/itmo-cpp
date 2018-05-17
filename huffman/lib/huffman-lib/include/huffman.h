@@ -16,8 +16,8 @@
 class Huffman {
 public:
     Huffman() = delete;
-    explicit Huffman(Frequency frequency);
-    explicit Huffman(std::unordered_map<uint8_t, Code> codes);
+    explicit Huffman(Frequency const &frequency);
+    explicit Huffman(std::unordered_map<uint8_t, Code> const &codes);
     std::unordered_map<uint8_t, Code> get_codes();
     ptr root;
 private:
