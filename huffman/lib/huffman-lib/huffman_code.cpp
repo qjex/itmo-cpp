@@ -25,7 +25,7 @@ void Code::pop_bit() {
     if ((data.size() - 1) * BLOCK_LEN >= _size) {
         data.pop_back();
     } else {
-        data.back() &= UINT8_MAX ^ (1 << get_pos(_size));
+        data.back() &= UINT32_MAX ^ (1 << get_pos(_size));
     }
 }
 
@@ -48,6 +48,6 @@ std::string Code::to_string() {
     return res;
 }
 
-std::vector<uint8_t> Code::get_data()const {
+std::vector<uint32_t> Code::get_data()const {
     return data;
 }

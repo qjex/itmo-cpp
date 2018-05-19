@@ -46,10 +46,10 @@ uint16_t BufferedReader::read_short() {
     return x;
 }
 
-std::vector<uint8_t> BufferedReader::read_vector(size_t sz) {
-    std::vector<uint8_t> res;
+std::vector<uint32_t> BufferedReader::read_vector(size_t sz) {
+    std::vector<uint32_t> res;
     for (size_t i = 0; i < sz; i++) {
-        res.push_back(read_char());
+        res.push_back(read_int());
     }
     return res;
 }
@@ -59,5 +59,12 @@ void BufferedReader::reset() {
     cnt_block = 0;
     stream.clear();
     stream.seekg(0, std::ios::beg);
+}
+
+uint32_t BufferedReader::read_int() {
+    uint32_t res = read_short();
+    res <<= 16;
+    res |= read_short();
+    return res;
 }
 

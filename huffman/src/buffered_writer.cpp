@@ -3,8 +3,10 @@
 //
 
 #include "buffered_writer.h"
+#include <algorithm>
 
-BufferedWriter::BufferedWriter(std::string const &file, bool encode) : stream(file, std::ofstream::binary), encode(encode) {
+BufferedWriter::BufferedWriter(std::string const &file, bool encode) : stream(file, std::ofstream::binary),
+                                                                       encode(encode) {
 }
 
 BufferedWriter::~BufferedWriter() {
@@ -26,14 +28,39 @@ void BufferedWriter::put_char(uint8_t c) {
 }
 
 void BufferedWriter::put_short(uint16_t x) {
-    put_char(static_cast<uint8_t>(x >> BLOCK_LEN));
+    put_char(static_cast<uint8_t>(x >> 8));
     put_char(static_cast<uint8_t>(x & UINT8_MAX));
 }
 
-void BufferedWriter::put_vector(std::vector<uint8_t> v) {
+void BufferedWriter::put_vector(std::vector<uint32_t> const &v) {
     for (auto x : v) {
-        put_char(x);
+        put_int(x);
     }
+}
+
+void BufferedWriter::put_code(Code const &code) {
+    for (size_t i = 0; i < code.size(); i++) {
+        put_bit(code.get(i));
+    }
+//    auto data = code.get_data();
+//    for (size_t i = 0; i < data.size(); i++) {
+//        small_buff <<= small_buff_size;
+//        small_buff |= data[i];
+//        small_buff_size += (i + 1 != data.size() ? 32 : code.size() - (32 * i));
+//
+//        if (small_buff_size > 32) {
+//            std::vector<uint32_t> to_write;
+//            while (small_buff_size > 32) {
+//                to_write.emplace_back(small_buff & UINT32_MAX);
+//                small_buff_size -= 32;
+//                small_buff >>= 32;
+//            }
+//            for (auto c = to_write.rbegin(); c != to_write.rend(); c++) {
+//                put_int(*c);
+//            }
+//        }
+//    }
+
 }
 
 void BufferedWriter::put_bit(bool b) {
@@ -42,7 +69,7 @@ void BufferedWriter::put_bit(bool b) {
     cur_char <<= 1;
     cur_char += b;
     if (cur_char_size == BLOCK_LEN) {
-        put_char(cur_char);
+        put_int(cur_char);
         cur_char_size = 0;
         cur_char = 0;
         last_byte_full = true;
@@ -60,5 +87,17 @@ void BufferedWriter::complete_byte() {
     } else {
         last_byte_size = last_byte_full ? BLOCK_LEN : 0;
     }
-    put_char(last_byte_size);
+    put_int(last_byte_size);
+}
+
+//void BufferedWriter::complete_byte() {
+//    if (small_buff_size != 0) {
+//        put_int(static_cast<uint32_t>(small_buff << (32 - small_buff_size)));
+//    }
+//    put_int(small_buff_size);
+//}
+
+void BufferedWriter::put_int(uint32_t x) {
+    put_short(static_cast<uint16_t>(x >> 16));
+    put_short(static_cast<uint16_t>(x & UINT16_MAX));
 }

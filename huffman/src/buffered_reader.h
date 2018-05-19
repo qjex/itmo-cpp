@@ -22,7 +22,8 @@ public:
     bool can_read();
     uint8_t read_char();
     uint16_t read_short();
-    std::vector<uint8_t> read_vector(size_t sz);
+    uint32_t read_int();
+    std::vector<uint32_t> read_vector(size_t sz);
     void reset();
 private:
     std::ifstream stream;

@@ -12,16 +12,16 @@
 
 struct Code {
     Code() : data(0), _size(0) {}
-    Code(size_t sz, const std::vector<uint8_t> &d) : _size(sz), data(d) {};
+    Code(size_t sz, const std::vector<uint32_t> &d) : _size(sz), data(d) {};
     void add_bit(bool b);
     void pop_bit();
     bool get(size_t ind) const;
     size_t size() const;
     void add(Code &code);
     std::string to_string();
-    std::vector<uint8_t> get_data()const;
+    std::vector<uint32_t> get_data()const;
 private:
-    std::vector<uint8_t> data;
+    std::vector<uint32_t> data;
     size_t _size;
 private:
     size_t get_pos(size_t ind) const;

@@ -5,6 +5,6 @@
 #ifndef HUFFMAN_CONSTS_H
 #define HUFFMAN_CONSTS_H
 
-static const size_t BLOCK_LEN = 8;
+static const size_t BLOCK_LEN = 32;
 
 #endif //HUFFMAN_CONSTS_H
