@@ -16,7 +16,10 @@ BufferedReader::~BufferedReader() {
 }
 
 bool BufferedReader::can_read() {
-    return !(stream.peek() == EOF && pos == cnt_block);
+    if (pos == cnt_block) {
+        read_buff();
+    }
+    return cnt_block != 0;
 }
 
 uint8_t BufferedReader::read_char() {
@@ -37,7 +40,7 @@ void BufferedReader::read_buff() {
 }
 
 uint16_t BufferedReader::read_short() {
-    short x = read_char();
+    uint16_t x = read_char();
     x <<= 8;
     x += read_char();
     return x;
@@ -57,5 +60,4 @@ void BufferedReader::reset() {
     stream.clear();
     stream.seekg(0, std::ios::beg);
 }
-
 

@@ -14,9 +14,9 @@ struct Node {
     ptr left;
     ptr right;
     uint8_t data = 0;
-    int freq;
+    unsigned long long freq;
 
-    Node(uint8_t c, int freq) {
+    Node(uint8_t c, unsigned long long freq) {
         this->data = c;
         this->freq = freq;
         left = right = nullptr;

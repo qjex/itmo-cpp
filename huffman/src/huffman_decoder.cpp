@@ -2,7 +2,7 @@
 // Created by Andrew Berlin on 5/8/18.
 //
 
-#include <unordered_map>
+#include <array>
 #include <vector>
 #include <stdexcept>
 
@@ -10,10 +10,9 @@
 #include "huffman_code.h"
 
 Decoder read_header(BufferedReader &reader) {
-    std::unordered_map<uint8_t, Code> codes;
-    short size = reader.read_short();
+    std::array<Code, 256> codes;
 
-    for (uint16_t i = 0; i < size; i++) {
+    for (uint16_t i = 0; i < 256; i++) {
         uint8_t c = reader.read_char();
         uint16_t sz = reader.read_short();
         uint16_t data_sz = reader.read_short();
@@ -27,10 +26,6 @@ Decoder read_header(BufferedReader &reader) {
 void decode(BufferedReader &reader, BufferedWriter &writer) {
     Decoder decoder = read_header(reader);
     uint8_t cur = reader.read_char();
-
-    if (decoder.get_codes().empty()) {
-        return;
-    }
 
     if (!reader.can_read()) {
         throw std::runtime_error("Decoding file is corrupted");

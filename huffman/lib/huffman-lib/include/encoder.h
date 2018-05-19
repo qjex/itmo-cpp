@@ -19,7 +19,7 @@ public:
     explicit Encoder(Frequency const &frequency);
     Code encode_segment(std::vector<uint8_t> const &data);
     Code encode_segment(std::string const &data);
-    Code encode_char(uint8_t c);
+    Code const & encode_char(uint8_t c);
 };
 
 #endif //HUFFMAN_LIB_ENCODER_H

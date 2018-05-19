@@ -21,7 +21,7 @@ Code Encoder::encode_segment(std::string const &data) {
     return encode_segment(tmp);
 }
 
-Code Encoder::encode_char(uint8_t c) {
+Code const &Encoder::encode_char(uint8_t c) {
     return codes[c];
 }
 

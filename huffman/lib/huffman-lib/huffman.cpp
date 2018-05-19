@@ -6,8 +6,10 @@
 #include <stdexcept>
 
 Huffman::Huffman(Frequency const &frequency) {
-    for (auto x : frequency.get_data()) {
-        auto t = ptr(new Node(x.first, x.second));
+    auto const &freq = frequency.get_data();
+    for (size_t i = 0; i < 256; i++) {
+        auto const &x = freq[i];
+        auto t = ptr(new Node(i, x));
         q.push(t);
     }
     build_tree();
@@ -56,18 +58,19 @@ void Huffman::store_codes(ptr const &v, Code &code) {
     code.pop_bit();
 }
 
-std::unordered_map<uint8_t, Code> Huffman::get_codes() {
+std::array<Code, 256> const &Huffman::get_codes() {
     return codes;
 }
 
-Huffman::Huffman(std::unordered_map<uint8_t, Code> const &codes) {
+Huffman::Huffman(std::array<Code, 256> const &codes) {
     this->codes = codes;
     root = ptr(new Node(0, 0));
-    for (auto c : codes) {
+    for (size_t it = 0; it < 256; it++) {
         auto cur = root;
+        auto const & c = codes[it];
 
-        for (size_t i = 0; i < c.second.size(); i++) {
-            bool b = c.second.get(i);
+        for (size_t i = 0; i < c.size(); i++) {
+            bool b = c.get(i);
 
             if (b) {
                 if (cur->right == nullptr) {
@@ -81,6 +84,6 @@ Huffman::Huffman(std::unordered_map<uint8_t, Code> const &codes) {
                 cur = cur->left;
             }
         }
-        cur->data = c.first;
+        cur->data = it;
     }
 }

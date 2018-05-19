@@ -7,19 +7,18 @@
 
 #include <vector>
 #include <string>
-#include <unordered_map>
+#include <array>
 
-typedef std::pair<char, int> occur;
+typedef std::pair<char, unsigned long long> occur;
 
 struct Frequency {
     Frequency() = default;
     explicit Frequency(std::string s);
     void add_char(uint8_t c, unsigned long long cnt);
     void add_char(uint8_t c);
-    std::vector<occur> get_data()const;
-    size_t size();
+    std::array<unsigned long long, 256> const &get_data()const;
 private:
-    std::unordered_map<uint8_t, unsigned long long> data;
+    std::array<unsigned long long, 256> data;
 };
 
 #endif //HUFFMAN_LIB_FREQUENCY_H

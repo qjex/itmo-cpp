@@ -12,16 +12,8 @@ void Frequency::add_char(uint8_t c) {
     add_char(c, 1);
 }
 
-std::vector<occur> Frequency::get_data()const {
-    std::vector<occur> res;
-    for (auto p : data) {
-        res.emplace_back(p);
-    }
-    return res;
-}
-
-size_t Frequency::size() {
-    return data.size();
+std::array<unsigned long long, 256> const &Frequency::get_data()const {
+    return data;
 }
 
 Frequency::Frequency(std::string s) {

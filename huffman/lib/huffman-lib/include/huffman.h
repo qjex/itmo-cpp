@@ -6,7 +6,7 @@
 #define HUFFMAN_LIB_HUFFMAN_H
 
 #include <queue>
-#include <unordered_map>
+#include <array>
 #include <climits>
 
 #include "frequency.h"
@@ -17,8 +17,8 @@ class Huffman {
 public:
     Huffman() = delete;
     explicit Huffman(Frequency const &frequency);
-    explicit Huffman(std::unordered_map<uint8_t, Code> const &codes);
-    std::unordered_map<uint8_t, Code> get_codes();
+    explicit Huffman(std::array<Code, 256> const &codes);
+    std::array<Code, 256> const &get_codes();
     ptr root;
 private:
     struct comparator {
@@ -28,7 +28,7 @@ private:
     };
     std::priority_queue<ptr, std::vector<ptr>, comparator> q;
 protected:
-    std::unordered_map<uint8_t, Code> codes;
+    std::array<Code, 256> codes;
 private:
     void build_tree();
     void store_codes(ptr const &root, Code& code);

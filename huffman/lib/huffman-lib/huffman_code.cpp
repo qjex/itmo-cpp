@@ -48,6 +48,6 @@ std::string Code::to_string() {
     return res;
 }
 
-std::vector<uint8_t> Code::get_data() {
+std::vector<uint8_t> Code::get_data()const {
     return data;
 }

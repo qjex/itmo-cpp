@@ -26,6 +26,7 @@ public:
     void put_bit(bool b);
     void complete_byte();
 private:
+    uint32_t small_buff = 0;
     uint8_t cur_char_size = 0;
     uint8_t cur_char = 0;
     uint8_t last_byte_size = 0;

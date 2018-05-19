@@ -46,7 +46,7 @@ uint8_t Decoder::get_char() {
     throw std::runtime_error("Can' get char from current stream of bits");
 }
 
-Decoder::Decoder(std::unordered_map<uint8_t, Code> const &codes) : Huffman(codes), cur_node(root) {
+Decoder::Decoder(std::array<Code, 256> const &codes) : Huffman(codes), cur_node(root) {
 
 }
 ptr Decoder::get_cur_node() {

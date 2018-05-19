@@ -19,7 +19,7 @@ struct Code {
     size_t size() const;
     void add(Code &code);
     std::string to_string();
-    std::vector<uint8_t> get_data();
+    std::vector<uint8_t> get_data()const;
 private:
     std::vector<uint8_t> data;
     size_t _size;

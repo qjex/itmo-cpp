@@ -17,14 +17,15 @@ Frequency calc_frequency(BufferedReader &reader) {
 }
 
 void write_header(Encoder &encoder, BufferedWriter &writer) {
-    auto codes = encoder.get_codes();
+    auto const& codes = encoder.get_codes();
 
-    writer.put_short(static_cast<uint16_t>(codes.size()));
-    for (auto c : codes) {
-        writer.put_char(c.first);
-        writer.put_short(static_cast<uint16_t>(c.second.size()));
-        writer.put_short(static_cast<uint16_t>(c.second.get_data().size()));
-        writer.put_vector(c.second.get_data());
+    for (size_t i = 0; i < 256; i++) {
+        auto const &c = codes[i];
+        auto const &data = c.get_data();
+        writer.put_char(static_cast<uint8_t>(i));
+        writer.put_short(static_cast<uint16_t>(c.size()));
+        writer.put_short(static_cast<uint16_t>(data.size()));
+        writer.put_vector(data);
     }
 }
 
@@ -32,7 +33,7 @@ void encode(Encoder &encoder, BufferedReader &reader, BufferedWriter &writer) {
     write_header(encoder, writer);
 
     while (reader.can_read()) {
-        auto code = encoder.encode_char(reader.read_char());
+        auto const &code = encoder.encode_char(reader.read_char());
         for (size_t i = 0; i < code.size(); i++) {
             writer.put_bit(code.get(i));
         }
