@@ -43,26 +43,24 @@ void BufferedWriter::put_code(Code const &code) {
         put_bit(code.get(i));
     }
 //    auto data = code.get_data();
-//    for (size_t i = 0; i < data.size(); i++) {
-//        small_buff <<= small_buff_size;
-//        small_buff |= data[i];
-//        small_buff_size += (i + 1 != data.size() ? 32 : code.size() - (32 * i));
+//    size_t code_size = code.size();
 //
-//        if (small_buff_size > 32) {
-//            std::vector<uint32_t> to_write;
-//            while (small_buff_size > 32) {
-//                to_write.emplace_back(small_buff & UINT32_MAX);
-//                small_buff_size -= 32;
-//                small_buff >>= 32;
-//            }
-//            for (auto c = to_write.rbegin(); c != to_write.rend(); c++) {
-//                put_int(*c);
-//            }
+//    for (size_t i = 0; i < data.size(); i++) {
+//        size_t cur_block_size = (i + 1 != data.size() ? 32 : code_size - (32 * i));
+//        small_buff <<= cur_block_size;
+//        small_buff &= (data[i] >> (32 - cur_block_size));
+//        small_buff |= (data[i] >> (32 - cur_block_size));
+//        small_buff_size += cur_block_size;
+//
+//        while (small_buff_size > 32) {
+//            put_int(static_cast<uint32_t>((small_buff >> (small_buff_size - 32)) & UINT32_MAX));
+//            small_buff <<= 32;
+//            small_buff_size -= 32;
 //        }
 //    }
 
 }
-
+//
 void BufferedWriter::put_bit(bool b) {
     last_byte_full = false;
     cur_char_size++;
@@ -92,7 +90,7 @@ void BufferedWriter::complete_byte() {
 
 //void BufferedWriter::complete_byte() {
 //    if (small_buff_size != 0) {
-//        put_int(static_cast<uint32_t>(small_buff << (32 - small_buff_size)));
+//        put_int(static_cast<uint32_t>((small_buff << (32 - small_buff_size)) & UINT32_MAX));
 //    }
 //    put_int(small_buff_size);
 //}

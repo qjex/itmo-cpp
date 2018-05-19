@@ -28,7 +28,7 @@ void decode(BufferedReader &reader, BufferedWriter &writer) {
     uint32_t cur = reader.read_int();
 
     if (!reader.can_read()) {
-        throw std::runtime_error("Decoding file is corrupted");
+        return;
     }
 
     do {
