@@ -44,7 +44,19 @@ public:
         template<typename W>
         list_iterator(const list_iterator<W> &other) {
             p = other.p;
-        };
+        }
+
+        const list_iterator operator++(int) {
+            list_iterator was(p);
+            ++(*this);
+            return was;
+        }
+
+        const list_iterator operator--(int) {
+            list_iterator was(p);
+            --(*this);
+            return was;
+        }
 
         V &operator*() {
             return (static_cast<list_node *>(p))->data;
