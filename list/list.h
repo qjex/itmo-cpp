@@ -6,6 +6,26 @@
 #define LIST_LIST_H
 
 #include <iterator>
+
+template <typename T>
+struct list;
+
+template <typename T>
+void swap(list<T> &a, list<T> &b) noexcept {
+    std::swap(a.fake, b.fake);
+
+    if (b.tail->l == a.tail) {
+        b.tail->l = b.tail->r = &b.fake;
+    }
+
+    if (a.tail->l == b.tail) {
+        a.tail->l = a.tail->r = &a.fake;
+    }
+
+    a.tail->l->r = a.tail->r->l = &a.fake;
+    b.tail->l->r = b.tail->r->l = &b.fake;
+}
+
 template<typename T>
 struct list {
 private:
@@ -84,7 +104,7 @@ public:
 
     list &operator=(const list &l) {
         list tmp(l);
-        swap(tmp);
+        swap(tmp, *this);
         return *this;
     }
 
@@ -175,6 +195,9 @@ public:
     }
 
     iterator splice(const_iterator pos, list &other, const_iterator first, const_iterator second) {
+        if (first == second) {
+            return pos;
+        }
         auto *r = second.p;
 
         second.p->l->r = pos.p;
@@ -213,9 +236,7 @@ public:
         return reverse_iterator(begin());
     }
 
-    void swap(list<T> &a) noexcept {
-        std::swap(a.tail, tail);
-    }
+    friend void swap<T>(list& lhs, list& rhs) noexcept;
 };
 
 #endif //LIST_LIST_H
