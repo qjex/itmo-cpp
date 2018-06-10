@@ -136,7 +136,7 @@ public:
         auto rem = tail->l;
         tail->l->l->r = tail;
         tail->l = tail->l->l;
-        delete rem;
+        delete static_cast<list_node*>(rem);
     }
 
     void push_front(T const &value) {
@@ -147,7 +147,7 @@ public:
         auto rem = tail->r;
         tail->r->r->l = tail;
         tail->r = tail->r->r;
-        delete rem;
+        delete static_cast<list_node*>(rem);
     }
 
     T &back() {
@@ -179,7 +179,7 @@ public:
         iterator ans(pos.p->r);
         pos.p->l->r = pos.p->r;
         pos.p->r->l = pos.p->l;
-        delete pos.p;
+        delete static_cast<list_node*>(pos.p);
         return ans;
     }
 
