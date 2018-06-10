@@ -33,7 +33,7 @@ public:
     class list_iterator : public std::iterator<std::forward_iterator_tag, V> {
     public:
         template<typename W>
-        list_iterator(const list_iterator<W> & other) {
+        list_iterator(const list_iterator<W> &other) {
             p = other.p;
         };
 
@@ -54,9 +54,14 @@ public:
         bool operator!=(const list_iterator &other) const {
             return p != other.p;
         }
+
+        bool operator==(const list_iterator &other) const {
+            return p == other.p;
+        }
+
         list_iterator(base_list_node *p) : p(p) {}
 
-        base_list_node* get() {
+        base_list_node *get() {
             return p;
         }
         base_list_node *p;
@@ -79,7 +84,7 @@ public:
 
     list &operator=(const list &l) {
         list tmp(l);
-        swap(tmp, *this);
+        swap(tmp);
         return *this;
     }
 
@@ -130,15 +135,23 @@ public:
     }
 
     T &back() {
-        return static_cast<list_node*>(tail->l)->data;
+        return static_cast<list_node *>(tail->l)->data;
     }
 
     T &front() {
-        return static_cast<list_node*>(tail->r)->data;
+        return static_cast<list_node *>(tail->r)->data;
+    }
+
+    T const &back() const {
+        return static_cast<list_node *>(tail->l)->data;
+    }
+
+    T const &front() const {
+        return static_cast<list_node *>(tail->r)->data;
     }
 
     iterator insert(const_iterator pos, T const &value) {
-        list_node* node = new list_node(value);
+        list_node *node = new list_node(value);
         node->l = pos.get()->l;
         node->r = pos.get();
         pos.get()->l->r = node;
@@ -161,7 +174,7 @@ public:
         return first;
     }
 
-    iterator splice(const_iterator pos, list& other, const_iterator first, const_iterator second) {
+    iterator splice(const_iterator pos, list &other, const_iterator first, const_iterator second) {
         auto *r = second.p;
 
         second.p->l->r = pos.p;
@@ -175,7 +188,6 @@ public:
         first.p->l = r;
         return iterator(pos.get());
     }
-
 
     iterator begin() {
         return iterator(tail->r);
@@ -201,11 +213,9 @@ public:
         return reverse_iterator(begin());
     }
 
-private:
-    void swap(list<T> &a, list<T> &b) {
-        std::swap(a.tail, b.tail);
+    void swap(list<T> &a) noexcept {
+        std::swap(a.tail, tail);
     }
 };
-
 
 #endif //LIST_LIST_H
