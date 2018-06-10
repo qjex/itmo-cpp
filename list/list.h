@@ -40,6 +40,7 @@ private:
 public:
     template<typename V>
     class list_iterator : public std::iterator<std::forward_iterator_tag, V> {
+        friend class list<T>;
     public:
         template<typename W>
         list_iterator(const list_iterator<W> &other) {
@@ -79,8 +80,10 @@ public:
         bool operator==(const list_iterator &other) const {
             return p == other.p;
         }
+    private:
+        list_iterator(base_list_node *p) : p(p) {
 
-        list_iterator(base_list_node *p) : p(p) {}
+        }
 
         base_list_node *get() {
             return p;
