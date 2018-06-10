@@ -12,7 +12,17 @@ struct list;
 
 template <typename T>
 void swap(list<T> &a, list<T> &b) noexcept {
-    std::swap(a.tail, b.tail);
+    std::swap(a.fake, b.fake);
+    if (b.tail->r == a.tail) {
+        b.tail->l = b.tail->r = &b.fake;
+    }
+
+    if (a.tail->r == b.tail) {
+        a.tail->l = a.tail->r = &a.fake;
+    }
+
+    a.tail->l->r = a.tail->r->l = &a.fake;
+    b.tail->l->r = b.tail->r->l = &b.fake;
 }
 
 template<typename T>
