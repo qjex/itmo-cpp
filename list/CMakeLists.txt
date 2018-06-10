@@ -16,3 +16,4 @@ add_executable(testing
         gtest/gtest_main.cc)
 
 include_directories(${CMAKE_SOURCE_DIR})
+target_link_libraries(testing -lpthread)
