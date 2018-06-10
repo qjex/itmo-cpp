@@ -49,7 +49,7 @@ private:
     base_list_node *tail;
 public:
     template<typename V>
-    class list_iterator : public std::iterator<std::forward_iterator_tag, V> {
+    class list_iterator : public std::iterator<std::bidirectional_iterator_tag, V> {
         friend class list<T>;
     public:
         template<typename W>
