@@ -12,18 +12,7 @@ struct list;
 
 template <typename T>
 void swap(list<T> &a, list<T> &b) noexcept {
-    std::swap(a.fake, b.fake);
-
-    if (b.tail->l == a.tail) {
-        b.tail->l = b.tail->r = &b.fake;
-    }
-
-    if (a.tail->l == b.tail) {
-        a.tail->l = a.tail->r = &a.fake;
-    }
-
-    a.tail->l->r = a.tail->r->l = &a.fake;
-    b.tail->l->r = b.tail->r->l = &b.fake;
+    std::swap(a.tail, b.tail);
 }
 
 template<typename T>
@@ -125,11 +114,7 @@ public:
     }
 
     void push_back(T const &value) {
-        auto *node = new list_node(value);
-        node->r = tail;
-        node->l = tail->l;
-        tail->l->r = node;
-        tail->l = node;
+        insert(end(), value);
     }
 
     void pop_back() {
@@ -140,11 +125,7 @@ public:
     }
 
     void push_front(T const &value) {
-        auto *node = new list_node(value);
-        node->l = tail;
-        node->r = tail->r;
-        tail->r->l = node;
-        tail->r = node;
+        insert(begin(), value);
     }
 
     void pop_front() {
