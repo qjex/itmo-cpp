@@ -217,6 +217,14 @@ public:
         return reverse_iterator(begin());
     }
 
+    const_reverse_iterator rbegin() const {
+        return reverse_iterator(end());
+    }
+
+    const_reverse_iterator rend() const {
+        return reverse_iterator(begin());
+    }
+
     friend void swap<T>(list& lhs, list& rhs) noexcept;
 };
 
