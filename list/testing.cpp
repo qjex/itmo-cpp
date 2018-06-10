@@ -42,6 +42,16 @@ TEST(correctness, assign) {
     EXPECT_TRUE(l.empty());
 }
 
+TEST(correctness, assign1) {
+    list<int> l, l2;
+    for (int i = 0; i < 22; i++) {
+        l.push_back(i);
+    }
+    l = l2;
+    EXPECT_TRUE(l.empty());
+    EXPECT_TRUE(l2.empty());
+}
+
 
 TEST(correctness, erase_multiple_1) {
     list<int> l;
