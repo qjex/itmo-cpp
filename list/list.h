@@ -13,16 +13,16 @@ struct list;
 template <typename T>
 void swap(list<T> &a, list<T> &b) noexcept {
     std::swap(a.fake, b.fake);
-    if (b.tail->r == a.tail) {
-        b.tail->l = b.tail->r = &b.fake;
+    if (b.tail()->r == a.tail()) {
+        b.tail()->l = b.tail()->r = &b.fake;
     }
 
-    if (a.tail->r == b.tail) {
-        a.tail->l = a.tail->r = &a.fake;
+    if (a.tail()->r == b.tail()) {
+        a.tail()->l = a.tail()->r = &a.fake;
     }
 
-    a.tail->l->r = a.tail->r->l = &a.fake;
-    b.tail->l->r = b.tail->r->l = &b.fake;
+    a.tail()->l->r = a.tail()->r->l = &a.fake;
+    b.tail()->l->r = b.tail()->r->l = &b.fake;
 }
 
 template<typename T>
@@ -45,8 +45,12 @@ private:
         }
     };
 
-    base_list_node fake;
-    base_list_node *tail;
+    mutable base_list_node fake;
+
+    base_list_node *tail() const {
+        return &fake;
+    }
+
 public:
     template<typename V>
     class list_iterator : public std::iterator<std::bidirectional_iterator_tag, V> {
@@ -107,9 +111,7 @@ public:
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     list() noexcept {
-        tail = &fake;
-        fake.l = tail;
-        fake.r = tail;
+        fake.l = fake.r = &fake;
     }
 
     ~list() {
@@ -129,7 +131,7 @@ public:
     }
 
     bool empty() const {
-        return tail->r == tail;
+        return tail()->r == tail();
     }
 
     void clear() {
@@ -143,9 +145,9 @@ public:
     }
 
     void pop_back() {
-        auto rem = tail->l;
-        tail->l->l->r = tail;
-        tail->l = tail->l->l;
+        auto rem = tail()->l;
+        tail()->l->l->r = tail();
+        tail()->l = tail()->l->l;
         delete static_cast<list_node*>(rem);
     }
 
@@ -154,26 +156,26 @@ public:
     }
 
     void pop_front() {
-        auto rem = tail->r;
-        tail->r->r->l = tail;
-        tail->r = tail->r->r;
+        auto rem = tail()->r;
+        tail()->r->r->l = tail();
+        tail()->r = tail()->r->r;
         delete static_cast<list_node*>(rem);
     }
 
     T &back() {
-        return static_cast<list_node *>(tail->l)->data;
+        return static_cast<list_node *>(tail()->l)->data;
     }
 
     T &front() {
-        return static_cast<list_node *>(tail->r)->data;
+        return static_cast<list_node *>(tail()->r)->data;
     }
 
     T const &back() const {
-        return static_cast<list_node *>(tail->l)->data;
+        return static_cast<list_node *>(tail()->l)->data;
     }
 
     T const &front() const {
-        return static_cast<list_node *>(tail->r)->data;
+        return static_cast<list_node *>(tail()->r)->data;
     }
 
     iterator insert(const_iterator pos, T const &value) {
@@ -219,19 +221,19 @@ public:
     }
 
     iterator begin() {
-        return iterator(tail->r);
+        return iterator(tail()->r);
     }
 
     iterator end() {
-        return iterator(tail);
+        return iterator(tail());
     }
 
     const_iterator begin() const {
-        return const_iterator(tail->r);
+        return const_iterator(tail()->r);
     }
 
     const_iterator end() const {
-        return const_iterator(tail);
+        return const_iterator(tail());
     }
 
     reverse_iterator rbegin() {
