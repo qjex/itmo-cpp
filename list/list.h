@@ -205,6 +205,14 @@ private:
     void swap(list<T> &a, list<T> &b) {
         std::swap(a.fake, b.fake);
 
+        if (b.tail->l == a.tail) {
+            b.tail->l = b.tail->r = &b.fake;
+        }
+
+        if (a.tail->l == b.tail) {
+            a.tail->l = a.tail->r = &a.fake;
+        }
+
         a.tail->l->r = &a.fake;
         a.tail->r->l = &a.fake;
 
