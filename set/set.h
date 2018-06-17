@@ -14,7 +14,7 @@ template<typename T>
 void swap(set<T> &a, set<T> &b) noexcept {
     std::swap(a.fake, b.fake);
     if (b.root()->l != nullptr) {
-       b.root()->l->parent = &b.fake;
+        b.root()->l->parent = &b.fake;
     }
     if (a.root()->l != nullptr) {
         a.root()->l->parent = &a.fake;
@@ -50,32 +50,37 @@ private:
         return &fake;
     }
 
-    void erase_impl(base_set_node *v) {
+    void erase_impl(base_set_node* v) {
         base_set_node *p = v->parent;
-        if (v->l != nullptr && v->r != nullptr) {
-            auto right = minimum(v->r);
-
-            if (right->parent != v) {
-                right->parent->l = nullptr;
-                right->parent = p;
-                right->r = v->r;
+        if (v->l && v->r) {
+            auto nxt = minimum(v->r);
+            if (!nxt->l && nxt->r) {
+                if (nxt->parent->l == nxt) {
+                    nxt->parent->l = nxt->r;
+                } else {
+                    nxt->parent->r = nxt->r;
+                }
+                nxt->r->parent = nxt->parent;
+            } else if (nxt->l && !nxt->r) {
+                if (nxt->parent->l == nxt) {
+                    nxt->parent->l = nxt->l;
+                } else {
+                    nxt->parent->r = nxt->l;
+                }
+                nxt->l->parent = nxt->parent;
+            }
+            
+            if (v->parent->l == v) {
+                v->parent->l = nxt;
             } else {
-                right->parent = p;
+                v->parent->r = nxt;
             }
+            v->r->parent = nxt;
+            v->l->parent = nxt;
 
-            right->l = v->l;
-
-            if (right->r != nullptr) {
-                right->r->parent = right;
-            }
-            if (right->l != nullptr) {
-                right->l->parent = right;
-            }
-            if (v == p->l) {
-                p->l = right;
-            } else {
-                p->r = right;
-            }
+            nxt->parent = v->parent;
+            nxt->l = v->l;
+            nxt->r = v->r;
         } else {
             if (v->l == nullptr && v->r == nullptr) {
                 if (p->l == v) {
@@ -111,7 +116,7 @@ private:
         if (v == nullptr) {
             return v;
         }
-        T x = static_cast<set_node*>(v)->data;
+        T const &x = static_cast<set_node *>(v)->data;
         if (!(val < x) && !(x < val)) {
             return v;
         }
@@ -129,7 +134,7 @@ private:
         return minimum(v->l);
     }
 
-    static base_set_node *  maximum(base_set_node *v) {
+    static base_set_node *maximum(base_set_node *v) {
         if (v->r == nullptr) {
             return v;
         }
@@ -160,12 +165,12 @@ private:
         return y;
     }
 
-    base_set_node* lower_bound(base_set_node *v, const T &value) {
+    base_set_node *lower_bound(base_set_node *v, T const &value) {
         if (v == nullptr) {
             return v;
         }
 
-        T z = static_cast<set_node*> (v)->data;
+        T const &z = static_cast<set_node *> (v)->data;
 
         if (!(z < value) && !(value < z)) {
             return v;
@@ -179,7 +184,7 @@ private:
         if (nxt == nullptr) {
             return v;
         }
-        T nxt_val = static_cast<set_node*> (nxt)->data;
+        T const &nxt_val = static_cast<set_node *> (nxt)->data;
 
         if (!(nxt_val < value)) {
             return nxt;
@@ -279,7 +284,7 @@ public:
     }
 
     void clear() noexcept {
-        for (auto e = begin(); e != end(); ) {
+        for (auto e = begin(); e != end();) {
             e = erase(e);
         }
     }
@@ -293,7 +298,7 @@ public:
 
         base_set_node *v = root()->l;
         while (v != nullptr) {
-            T z = static_cast<set_node *>(v)->data;
+            T const &z = static_cast<set_node *>(v)->data;
 
             if (z < value) {
                 if (v->r != nullptr) {

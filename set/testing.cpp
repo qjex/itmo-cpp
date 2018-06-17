@@ -112,6 +112,9 @@ TEST(correctness, erase5) {
     set<int> s;
     mass_push_back(s, {5, 2, 10, 6, 14, 7, 8});
     s.erase(s.find(5));
+//    for (auto x : s) {
+//        std::cerr << x << std::endl;
+//    }
     expect_eq(s, {2, 6, 7, 8, 10, 14});
 }
 
