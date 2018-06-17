@@ -117,10 +117,10 @@ TEST(correctness, erase5) {
 
 TEST(correctness, erase_root) {
     set<int> s;
-    mass_push_back(s, {5, 3, 8, 1, 2});
+    mass_push_back(s, {5, 3, 8});
     s.erase(s.find(5));
 
-    expect_eq(s, {1, 2, 3, 8});
+    expect_eq(s, {3, 8});
 }
 
 TEST(correctness, reverse_iterator_rbeg_to_rend) {

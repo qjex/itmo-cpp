@@ -54,7 +54,13 @@ private:
         base_set_node *p = v->parent;
         if (v->l && v->r) {
             auto nxt = minimum(v->r);
-            if (!nxt->l && nxt->r) {
+            if (!nxt->l && !nxt->r) {
+                if (nxt->parent->l == nxt) {
+                    nxt->parent->l = nullptr;
+                } else {
+                    nxt->parent->r = nullptr;
+                }
+            } else if (!nxt->l && nxt->r) {
                 if (nxt->parent->l == nxt) {
                     nxt->parent->l = nxt->r;
                 } else {
@@ -69,14 +75,18 @@ private:
                 }
                 nxt->l->parent = nxt->parent;
             }
-            
+
             if (v->parent->l == v) {
                 v->parent->l = nxt;
             } else {
                 v->parent->r = nxt;
             }
-            v->r->parent = nxt;
-            v->l->parent = nxt;
+            if (v->r) {
+                v->r->parent = nxt;
+            }
+            if (v->l) {
+                v->l->parent = nxt;
+            }
 
             nxt->parent = v->parent;
             nxt->l = v->l;
