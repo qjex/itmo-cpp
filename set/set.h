@@ -175,7 +175,7 @@ private:
         return y;
     }
 
-    base_set_node *lower_bound(base_set_node *v, T const &value) {
+    base_set_node *lower_bound(base_set_node *v, T const &value) const {
         if (v == nullptr) {
             return v;
         }
@@ -342,7 +342,7 @@ public:
         return ans;
     }
 
-    const_iterator find(T const &value) const noexcept {
+    const_iterator find(T const &value) const {
         auto res = find(root()->l, value);
 
         if (res == nullptr) {
@@ -351,7 +351,7 @@ public:
         return const_iterator(res);
     }
 
-    const_iterator lower_bound(T const &value) noexcept {
+    const_iterator lower_bound(T const &value) const{
         if (empty()) {
             return const_iterator(root());
         }
@@ -363,7 +363,7 @@ public:
         return const_iterator(root());
     }
 
-    const_iterator upper_bound(T const &value) noexcept {
+    const_iterator upper_bound(T const &value) const {
         if (empty()) {
             return const_iterator(root());
         }

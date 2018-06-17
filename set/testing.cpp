@@ -734,6 +734,32 @@ TEST(exceptions, less_operator) {
         s.insert(dummy_ex(1));
         s.find(1);
     } catch (...) {
-        EXPECT_EQ(true, false);
     }
+    try {
+        set<dummy_ex> s;
+        s.insert(dummy_ex(1));
+        s.lower_bound(dummy_ex(1));
+    } catch (...) {
+    }
+    try {
+        set<dummy_ex> s;
+        s.insert(dummy_ex(1));
+        s.upper_bound(dummy_ex(1));
+    } catch (...) {
+    }
+}
+
+TEST(exceptions, no_throw) {
+
+    try {
+        set<dummy_ex> s;
+        auto it = s.insert(dummy_ex(1));
+        s.erase(it.first);
+        s.empty();
+        s.insert(dummy_ex(2));
+        s.clear();
+    } catch (...) {
+        ASSERT_TRUE(false);
+    }
+
 }
