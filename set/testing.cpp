@@ -112,10 +112,15 @@ TEST(correctness, erase5) {
     set<int> s;
     mass_push_back(s, {5, 2, 10, 6, 14, 7, 8});
     s.erase(s.find(5));
-//    for (auto x : s) {
-//        std::cerr << x << std::endl;
-//    }
     expect_eq(s, {2, 6, 7, 8, 10, 14});
+}
+
+TEST(correctness, erase_root) {
+    set<int> s;
+    mass_push_back(s, {5, 3, 8, 1, 2});
+    s.erase(s.find(5));
+
+    expect_eq(s, {1, 2, 3, 8});
 }
 
 TEST(correctness, reverse_iterator_rbeg_to_rend) {
