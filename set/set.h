@@ -194,12 +194,15 @@ public:
     class set_iterator : public std::iterator<std::bidirectional_iterator_tag, V> {
         friend class set<T>;
     public:
-        template<typename W>
-        set_iterator(const set_iterator<W> &other) {
+        set_iterator(const set_iterator<V> &other) {
             p = other.p;
         }
 
-        V const *operator->() {
+        set_iterator() {
+            p = nullptr;
+        }
+
+        V const *operator->() const {
             return &(static_cast<set_node *>(p)->data);
         }
 
@@ -215,7 +218,7 @@ public:
             return was;
         }
 
-        V &operator*() {
+        V &operator*() const {
             return (static_cast<set_node *>(p))->data;
         }
 

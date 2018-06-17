@@ -101,6 +101,13 @@ TEST(correctness, 3_4_5) {
     }
 }
 
+TEST(correctness, iterator_const) {
+    set<int> s;
+    s.insert(1);
+    const set<int>::iterator i = s.begin();
+    EXPECT_EQ(1, *i);
+}
+
 TEST(correctness, reverse_iterator_rbeg_to_rend) {
     set<int> a;
     std::set<int> b;
