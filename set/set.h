@@ -50,14 +50,11 @@ private:
         return &fake;
     }
 
-    void erase_node(base_set_node *v) {
+    void erase_impl(base_set_node *v) {
         base_set_node *p = v->parent;
         if (v->l != nullptr && v->r != nullptr) {
-            auto right = v->r;
+            auto right = minimum(v->r);
 
-            while (right->l != nullptr) {
-                right = right->l;
-            }
             if (right->parent != v) {
                 right->parent->l = nullptr;
                 right->parent = p;
@@ -65,7 +62,9 @@ private:
             } else {
                 right->parent = p;
             }
+
             right->l = v->l;
+
             if (right->r != nullptr) {
                 right->r->parent = right;
             }
@@ -77,27 +76,29 @@ private:
             } else {
                 p->r = right;
             }
-        } else if (v->r != nullptr) {
-            auto right = v->r;
-            right->parent = p;
-            if (v == p->l) {
-                p->l = right;
-            } else {
-                p->r = right;
-            }
-        } else if (v->l != nullptr) {
-            auto tmp = v->l;
-            tmp->parent = p;
-            if (v == p->l) {
-                p->l = tmp;
-            } else {
-                p->r = tmp;
-            }
         } else {
-            if (p->l == v) {
-                p->l = nullptr;
+            if (v->l == nullptr && v->r == nullptr) {
+                if (p->l == v) {
+                    p->l = nullptr;
+                } else {
+                    p->r = nullptr;
+                }
             } else {
-                p->r = nullptr;
+                if (v->r == nullptr) {
+                    if (v == p->l) {
+                        p->l = v->l;
+                    } else {
+                        p->r = v->l;
+                    }
+                    v->l->parent = p;
+                } else if (v->l == nullptr) {
+                    if (v == p->l) {
+                        p->l = v->r;
+                    } else {
+                        p->r = v->r;
+                    }
+                    v->r->parent = p;
+                }
             }
         }
         v->parent = nullptr;
@@ -319,7 +320,7 @@ public:
     iterator erase(const_iterator pos) noexcept {
         iterator ans(pos);
         ++ans;
-        erase_node(pos.p);
+        erase_impl(pos.p);
         return ans;
     }
 
