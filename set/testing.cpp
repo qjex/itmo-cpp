@@ -750,10 +750,15 @@ TEST(exceptions, less_operator) {
 }
 
 TEST(exceptions, no_throw) {
-
+    set<dummy_ex> s;
+    std::pair<set<dummy_ex>::iterator, bool> it;
+    it.second = 0;
     try {
-        set<dummy_ex> s;
-        auto it = s.insert(dummy_ex(1));
+        it = s.insert(dummy_ex(1));
+    } catch (...) {
+    }
+    try {
+        set<dummy_ex> s1;
         s.erase(it.first);
         s.empty();
         s.insert(dummy_ex(2));
