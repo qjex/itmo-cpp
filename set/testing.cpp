@@ -101,7 +101,7 @@ TEST(correctness, 3_4_5) {
     }
 }
 
-TEST(correctness, iterator_const) {
+TEST(iterators, iterator_const) {
     set<int> s;
     s.insert(1);
     const set<int>::iterator i = s.begin();
