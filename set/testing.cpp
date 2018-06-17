@@ -715,3 +715,25 @@ TEST(correctness, no_def_constructor) {
 
     ASSERT_EQ(1, (*s.begin()).x);
 }
+
+
+struct dummy_ex {
+    int x;
+
+    dummy_ex() = delete;
+    dummy_ex(int x) : x(x) {}
+
+    friend bool operator<(const dummy_ex &a, const dummy_ex &b) {
+        throw std::runtime_error("exception");
+    }
+};
+
+TEST(exceptions, less_operator) {
+    try {
+        set<dummy_ex> s;
+        s.insert(dummy_ex(1));
+        s.find(1);
+    } catch (...) {
+        EXPECT_EQ(true, false);
+    }
+}
